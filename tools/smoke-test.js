@@ -178,23 +178,28 @@ try {
       '--host-resolver-rules=MAP * ~NOTFOUND',
       '--virtual-time-budget=60000',
       '--dump-dom',
-      fileUrl,
+      fileUrl
     ],
     {
       maxBuffer: 64 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'ignore'],
       // Sin esto, un cuelgue del navegador deja el proceso vivo indefinidamente.
       timeout: 180000,
-      killSignal: 'SIGKILL',
+      killSignal: 'SIGKILL'
     }
   ).toString('utf8');
 } catch (e) {
   // Con timeout o salida no-cero, stdout parcial sigue sirviendo: el probe vuelca
   // su progreso tras cada paso, así que indica hasta dónde llegó.
   out = e.stdout ? e.stdout.toString('utf8') : '';
-  failure = e.killed || e.signal ? `el navegador excedió el límite de tiempo (${e.signal || 'timeout'})` : e.message;
+  failure =
+    e.killed || e.signal
+      ? `el navegador excedió el límite de tiempo (${e.signal || 'timeout'})`
+      : e.message;
 } finally {
-  try { fs.unlinkSync(harnessPath); } catch {}
+  try {
+    fs.unlinkSync(harnessPath);
+  } catch {}
 }
 
 fs.writeFileSync(dump, out, 'utf8');

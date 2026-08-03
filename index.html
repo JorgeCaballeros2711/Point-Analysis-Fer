@@ -1,599 +1,1960 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Análisis de Puntos</title>
-<!-- Dependencias locales: la app debe funcionar sin internet. Ver vendor/README.md -->
-<script src="vendor/xlsx.full.min.js"></script>
-<script src="vendor/fonts-poppins.js"></script>
-<style id="main-css">
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1D1A74;--teal:#9C38DF;--teal-light:#F5EEFF;--accent:#C63CFC;
-  --gray:#F7F5FF;--border:#E0D0F5;--text:#1D1A74;--muted:#7B5EA7;
-  --green:#2D9E6B;--green-bg:#E8F7F1;--orange:#E67E22;--red:#C0392B;
-  --p-dark:#1D1A74;--p-mid:#9C38DF;--p-light:#C63CFC;--p-pale:#F5EEFF;--p-border:#DDB8F5;
-}
-body{font-family:'Poppins',system-ui,sans-serif;background:var(--gray);color:var(--text);min-height:100vh;overflow-x:hidden}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análisis de Puntos</title>
+    <!-- Dependencias locales: la app debe funcionar sin internet. Ver vendor/README.md -->
+    <script src="vendor/xlsx.full.min.js"></script>
+    <script src="vendor/fonts-poppins.js"></script>
+    <style id="main-css">
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --navy: #1d1a74;
+        --teal: #9c38df;
+        --teal-light: #f5eeff;
+        --accent: #c63cfc;
+        --gray: #f7f5ff;
+        --border: #e0d0f5;
+        --text: #1d1a74;
+        --muted: #7b5ea7;
+        --green: #2d9e6b;
+        --green-bg: #e8f7f1;
+        --orange: #e67e22;
+        --red: #c0392b;
+        --p-dark: #1d1a74;
+        --p-mid: #9c38df;
+        --p-light: #c63cfc;
+        --p-pale: #f5eeff;
+        --p-border: #ddb8f5;
+      }
+      body {
+        font-family: 'Poppins', system-ui, sans-serif;
+        background: var(--gray);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
 
-#upload-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy) 0%,var(--teal) 100%);padding:2rem}
-.upload-logo{color:white;font-size:2rem;font-weight:700;margin-bottom:.4rem}
-.upload-sub{color:rgba(255,255,255,.7);font-size:.95rem;margin-bottom:2rem}
-.upload-card{background:white;border-radius:16px;padding:2.5rem;max-width:540px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
-.upload-card h2{font-size:1.35rem;color:var(--p-dark);margin-bottom:.4rem}
-.upload-card>p{color:var(--muted);font-size:.88rem;margin-bottom:1.25rem;line-height:1.6}
-.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray)}
-.drop-zone:hover,.drop-zone.drag-over{border-color:var(--p-mid);background:var(--teal-light)}
-.drop-icon{font-size:2.5rem;margin-bottom:.6rem}
-.drop-zone p{color:var(--muted);font-size:.88rem}
-.drop-zone strong{color:var(--p-mid)}
-#file-input{display:none}
-#file-name{color:var(--green);font-size:.82rem;margin-top:.5rem;font-weight:600;min-height:18px}
-.btn-primary{background:var(--p-mid);color:white;border:none;border-radius:8px;padding:.7rem 1.4rem;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s;width:100%;margin-top:.9rem}
-.btn-primary:hover{background:var(--p-dark)}
-.upload-hint{color:var(--muted);font-size:.78rem;margin-top:.6rem;text-align:center}
-.sheet-status{margin-top:1rem;padding:.75rem 1rem;background:var(--gray);border-radius:8px;font-size:.82rem}
-.sheet-row{display:flex;align-items:center;gap:.5rem;padding:.2rem 0}
-.dot-ok{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.dot-miss{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+      #upload-screen {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+        padding: 2rem;
+      }
+      .upload-logo {
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+      }
+      .upload-sub {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+      .upload-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        max-width: 540px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      }
+      .upload-card h2 {
+        font-size: 1.35rem;
+        color: var(--p-dark);
+        margin-bottom: 0.4rem;
+      }
+      .upload-card > p {
+        color: var(--muted);
+        font-size: 0.88rem;
+        margin-bottom: 1.25rem;
+        line-height: 1.6;
+      }
+      .drop-zone {
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: var(--gray);
+      }
+      .drop-zone:hover,
+      .drop-zone.drag-over {
+        border-color: var(--p-mid);
+        background: var(--teal-light);
+      }
+      .drop-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.6rem;
+      }
+      .drop-zone p {
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      .drop-zone strong {
+        color: var(--p-mid);
+      }
+      #file-input {
+        display: none;
+      }
+      #file-name {
+        color: var(--green);
+        font-size: 0.82rem;
+        margin-top: 0.5rem;
+        font-weight: 600;
+        min-height: 18px;
+      }
+      .btn-primary {
+        background: var(--p-mid);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.7rem 1.4rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+        margin-top: 0.9rem;
+      }
+      .btn-primary:hover {
+        background: var(--p-dark);
+      }
+      .upload-hint {
+        color: var(--muted);
+        font-size: 0.78rem;
+        margin-top: 0.6rem;
+        text-align: center;
+      }
+      .sheet-status {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        background: var(--gray);
+        border-radius: 8px;
+        font-size: 0.82rem;
+      }
+      .sheet-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.2rem 0;
+      }
+      .dot-ok {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        flex-shrink: 0;
+      }
+      .dot-miss {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--border);
+        flex-shrink: 0;
+      }
 
-#report-screen{display:none;width:100%}
-.report-header{background:linear-gradient(135deg,#1D1A74,#4D1EA8);color:white;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 4px 16px rgba(45,27,105,.35)}
-.header-logo{font-size:1.05rem;font-weight:700}
-.header-actions{display:flex;gap:.6rem;align-items:center}
-.btn-header{background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.38rem .9rem;cursor:pointer;font-size:.82rem;transition:background .2s;white-space:nowrap}
-.btn-header:hover{background:rgba(255,255,255,.28)}
-.btn-export{background:rgba(255,255,255,.92);color:var(--p-dark);font-weight:700;border:none}
-.btn-export:hover{background:white}
+      #report-screen {
+        display: none;
+        width: 100%;
+      }
+      .report-header {
+        background: linear-gradient(135deg, #1d1a74, #4d1ea8);
+        color: white;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 200;
+        box-shadow: 0 4px 16px rgba(45, 27, 105, 0.35);
+      }
+      .header-logo {
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+      .header-actions {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+      }
+      .btn-header {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 8px;
+        padding: 0.38rem 0.9rem;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: background 0.2s;
+        white-space: nowrap;
+      }
+      .btn-header:hover {
+        background: rgba(255, 255, 255, 0.28);
+      }
+      .btn-export {
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--p-dark);
+        font-weight: 700;
+        border: none;
+      }
+      .btn-export:hover {
+        background: white;
+      }
 
-.point-selector-bar{background:white;border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
-.point-selector-bar label{font-size:.82rem;font-weight:600;color:var(--muted);white-space:nowrap}
-#point-select{padding:.45rem .85rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;color:var(--text);background:white;cursor:pointer;min-width:220px;outline:none}
-#point-select:focus{border-color:var(--p-mid)}
-.point-badge{background:var(--p-pale);color:var(--p-mid);border-radius:20px;padding:.2rem .75rem;font-size:.78rem;font-weight:600}
+      .point-selector-bar {
+        background: white;
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .point-selector-bar label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      #point-select {
+        padding: 0.45rem 0.85rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.88rem;
+        color: var(--text);
+        background: white;
+        cursor: pointer;
+        min-width: 220px;
+        outline: none;
+      }
+      #point-select:focus {
+        border-color: var(--p-mid);
+      }
+      .point-badge {
+        background: var(--p-pale);
+        color: var(--p-mid);
+        border-radius: 20px;
+        padding: 0.2rem 0.75rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+      }
 
-.nav-tabs{background:white;border-bottom:1px solid var(--border);display:flex;padding:0 1.5rem;overflow-x:auto;position:sticky;top:56px;z-index:199;max-width:100vw}
-.nav-tab{padding:.9rem 1.1rem;font-size:.82rem;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:all .2s}
-.nav-tab:hover{color:var(--p-mid)}
-.nav-tab.active{color:var(--p-mid);border-bottom-color:var(--p-mid)}
+      .nav-tabs {
+        background: white;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        padding: 0 1.5rem;
+        overflow-x: auto;
+        position: sticky;
+        top: 56px;
+        z-index: 199;
+        max-width: 100vw;
+      }
+      .nav-tab {
+        padding: 0.9rem 1.1rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--muted);
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+      }
+      .nav-tab:hover {
+        color: var(--p-mid);
+      }
+      .nav-tab.active {
+        color: var(--p-mid);
+        border-bottom-color: var(--p-mid);
+      }
 
-.content-area{padding:1.5rem 2rem;max-width:1200px;margin:0 auto;box-sizing:border-box;overflow-x:hidden}
-.section{display:none}.section.active{display:block !important;box-sizing:border-box}
-.section-title{font-size:1.15rem;font-weight:700;color:var(--p-dark);margin-bottom:1.1rem;display:flex;align-items:center;gap:.5rem}
-.section-title::before{content:'';display:block;width:4px;height:18px;background:var(--p-mid);border-radius:2px}
+      .content-area {
+        padding: 1.5rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        overflow-x: hidden;
+      }
+      .section {
+        display: none;
+      }
+      .section.active {
+        display: block !important;
+        box-sizing: border-box;
+      }
+      .section-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--p-dark);
+        margin-bottom: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .section-title::before {
+        content: '';
+        display: block;
+        width: 4px;
+        height: 18px;
+        background: var(--p-mid);
+        border-radius: 2px;
+      }
 
-.card{background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.25rem;box-sizing:border-box}
-.card-header{background:linear-gradient(135deg,#1D1A74,#9C38DF);color:white;padding:.85rem 1.25rem;font-size:.92rem;font-weight:600;display:flex;align-items:center;gap:.45rem}
-.card-header.teal{background:var(--p-mid)}
-.card-body{padding:1.25rem}
+      .card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+        box-sizing: border-box;
+      }
+      .card-header {
+        background: linear-gradient(135deg, #1d1a74, #9c38df);
+        color: white;
+        padding: 0.85rem 1.25rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .card-header.teal {
+        background: var(--p-mid);
+      }
+      .card-body {
+        padding: 1.25rem;
+      }
 
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem}
-@media(max-width:800px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+      }
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.85rem;
+      }
+      @media (max-width: 800px) {
+        .grid-2,
+        .grid-3,
+        .grid-4 {
+          grid-template-columns: 1fr;
+        }
+      }
 
-.hero-banner{background:linear-gradient(135deg,#1D1A74 0%,#9C38DF 100%);color:white;border-radius:12px;padding:1.75rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.75rem}
-.hero-icon{font-size:2.5rem;opacity:.9}
-.hero-text h1{font-size:1.6rem;font-weight:700;margin-bottom:.2rem}
-.hero-text p{color:rgba(255,255,255,.7);font-size:.9rem}
-.hero-meta{display:flex;gap:.75rem;margin-top:.6rem;flex-wrap:wrap}
-.hero-chip{background:rgba(255,255,255,.15);padding:.2rem .65rem;border-radius:20px;font-size:.78rem}
+      .hero-banner {
+        background: linear-gradient(135deg, #1d1a74 0%, #9c38df 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 1.75rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1.75rem;
+      }
+      .hero-icon {
+        font-size: 2.5rem;
+        opacity: 0.9;
+      }
+      .hero-text h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+      }
+      .hero-text p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+      }
+      .hero-meta {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.6rem;
+        flex-wrap: wrap;
+      }
+      .hero-chip {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.78rem;
+      }
 
-.map-placeholder{background:var(--p-pale);border:2px dashed var(--p-mid);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:260px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.map-placeholder:hover{background:#E8E0FF}
-.map-placeholder .map-icon{font-size:2rem;margin-bottom:.5rem;opacity:.5}
-.map-placeholder p{color:var(--p-mid);font-weight:600;font-size:.85rem}
-.map-placeholder small{color:var(--muted);font-size:.75rem;margin-top:.2rem}
-.map-placeholder img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px}
-.map-placeholder .overlay-btn{position:absolute;bottom:.6rem;right:.6rem;background:rgba(10,35,66,.8);color:white;border:none;border-radius:6px;padding:.35rem .7rem;font-size:.75rem;cursor:pointer}
+      .map-placeholder {
+        background: var(--p-pale);
+        border: 2px dashed var(--p-mid);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 260px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+      .map-placeholder:hover {
+        background: #e8e0ff;
+      }
+      .map-placeholder .map-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+      }
+      .map-placeholder p {
+        color: var(--p-mid);
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+      .map-placeholder small {
+        color: var(--muted);
+        font-size: 0.75rem;
+        margin-top: 0.2rem;
+      }
+      .map-placeholder img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      .map-placeholder .overlay-btn {
+        position: absolute;
+        bottom: 0.6rem;
+        right: 0.6rem;
+        background: rgba(10, 35, 66, 0.8);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.35rem 0.7rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
 
-.editable-text{border:1.5px dashed var(--border);border-radius:8px;padding:.9rem;min-height:70px;font-size:.88rem;line-height:1.6;color:var(--text);outline:none;cursor:text;transition:border-color .2s;background:#FAFBFD}
-.editable-text:focus{border-color:var(--p-mid);background:white}
-.editable-hint{font-size:.73rem;color:var(--muted);margin-top:.25rem}
+      .editable-text {
+        border: 1.5px dashed var(--border);
+        border-radius: 8px;
+        padding: 0.9rem;
+        min-height: 70px;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        color: var(--text);
+        outline: none;
+        cursor: text;
+        transition: border-color 0.2s;
+        background: #fafbfd;
+      }
+      .editable-text:focus {
+        border-color: var(--p-mid);
+        background: white;
+      }
+      .editable-hint {
+        font-size: 0.73rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+      }
 
-.stat-card{background:var(--gray);border-radius:10px;padding:.75rem .5rem;text-align:center;border:1px solid var(--border);min-width:0;overflow:hidden}
-.stat-value{font-size:1.1rem;font-weight:700;color:var(--p-dark);word-break:break-word;overflow-wrap:break-word}
-.stat-label{font-size:.72rem;color:var(--muted);margin-top:.15rem;line-height:1.3}
+      .stat-card {
+        background: var(--gray);
+        border-radius: 10px;
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        border: 1px solid var(--border);
+        min-width: 0;
+        overflow: hidden;
+      }
+      .stat-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--p-dark);
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+      .stat-label {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 0.15rem;
+        line-height: 1.3;
+      }
 
-.nse-row{display:flex;align-items:center;gap:.65rem;margin-bottom:.5rem}
-.nse-label{width:38px;font-size:.78rem;font-weight:700;color:var(--p-dark)}
-.nse-bar-wrap{flex:1;background:var(--p-border);border-radius:20px;height:9px;overflow:hidden}
-.nse-bar{height:100%;border-radius:20px;transition:width .5s ease}
-.nse-value{width:38px;font-size:.78rem;color:var(--muted);text-align:right}
+      .nse-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-bottom: 0.5rem;
+      }
+      .nse-label {
+        width: 38px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--p-dark);
+      }
+      .nse-bar-wrap {
+        flex: 1;
+        background: var(--p-border);
+        border-radius: 20px;
+        height: 9px;
+        overflow: hidden;
+      }
+      .nse-bar {
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.5s ease;
+      }
+      .nse-value {
+        width: 38px;
+        font-size: 0.78rem;
+        color: var(--muted);
+        text-align: right;
+      }
 
-.h-table-wrap{overflow-x:auto}
-.h-table{border-collapse:collapse;font-size:.83rem;min-width:100%;width:100%}
-.h-table th{background:var(--p-dark);color:white;padding:.6rem 1rem;text-align:center;white-space:nowrap;font-weight:700;font-size:.8rem;letter-spacing:.3px}
-.h-table th.row-label{text-align:left;background:#1D1A74;min-width:200px}
-.h-table td{padding:.55rem 1rem;border-bottom:1px solid var(--p-border);text-align:center;white-space:nowrap;font-size:.83rem}
-.h-table tr:last-child td{border-bottom:none}
-.h-table tr:hover td{background:var(--p-pale)}
-.h-table td.row-label{text-align:left;font-weight:600;color:var(--p-dark);background:#FAF8FF;font-size:.82rem}
-.h-table td.promedio-col{color:#1D1A74;font-weight:600;background:#F5F2FF}
-.h-table td.punto-col{background:#F0E5FF;font-weight:800;color:var(--p-dark);font-size:.85rem}
-.h-table td.cumpl-col{font-weight:700}
-.h-table .pct-green{color:var(--green)}
-.h-table .pct-orange{color:var(--orange)}
-.h-table .pct-red{color:var(--red)}
-.h-table th.nat-head{background:#1D1A74}
-.h-table th.punto-head{background:var(--p-mid)}
-.h-table th.cumpl-head{background:#7B62CC}
-.h-table th.comp-head{background:#4D1EA8}
-.h-table th.bench-head{background:#5C3FA0}
-.section-group-label td{background:#F0E5FF;font-size:.78rem;font-weight:700;color:var(--p-dark);padding:.4rem 1rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--p-border)}
-/* Two-table compliance layout */
-.compliance-tables{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
-@media(max-width:900px){.compliance-tables{grid-template-columns:1fr}}
-.compliance-card{background:white;border-radius:12px;border:1px solid var(--p-border);overflow:hidden}
-.compliance-card-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.compliance-card-header{padding:.8rem 1.1rem;font-size:.88rem;font-weight:700;color:white;display:flex;align-items:center;gap:.4rem}
-.ch-nacional{background:linear-gradient(135deg,#1D1A74,#4D1EA8)}
-.ch-bench{background:linear-gradient(135deg,#4D1EA8,#9C38DF)}
+      .h-table-wrap {
+        overflow-x: auto;
+      }
+      .h-table {
+        border-collapse: collapse;
+        font-size: 0.83rem;
+        min-width: 100%;
+        width: 100%;
+      }
+      .h-table th {
+        background: var(--p-dark);
+        color: white;
+        padding: 0.6rem 1rem;
+        text-align: center;
+        white-space: nowrap;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.3px;
+      }
+      .h-table th.row-label {
+        text-align: left;
+        background: #1d1a74;
+        min-width: 200px;
+      }
+      .h-table td {
+        padding: 0.55rem 1rem;
+        border-bottom: 1px solid var(--p-border);
+        text-align: center;
+        white-space: nowrap;
+        font-size: 0.83rem;
+      }
+      .h-table tr:last-child td {
+        border-bottom: none;
+      }
+      .h-table tr:hover td {
+        background: var(--p-pale);
+      }
+      .h-table td.row-label {
+        text-align: left;
+        font-weight: 600;
+        color: var(--p-dark);
+        background: #faf8ff;
+        font-size: 0.82rem;
+      }
+      .h-table td.promedio-col {
+        color: #1d1a74;
+        font-weight: 600;
+        background: #f5f2ff;
+      }
+      .h-table td.punto-col {
+        background: #f0e5ff;
+        font-weight: 800;
+        color: var(--p-dark);
+        font-size: 0.85rem;
+      }
+      .h-table td.cumpl-col {
+        font-weight: 700;
+      }
+      .h-table .pct-green {
+        color: var(--green);
+      }
+      .h-table .pct-orange {
+        color: var(--orange);
+      }
+      .h-table .pct-red {
+        color: var(--red);
+      }
+      .h-table th.nat-head {
+        background: #1d1a74;
+      }
+      .h-table th.punto-head {
+        background: var(--p-mid);
+      }
+      .h-table th.cumpl-head {
+        background: #7b62cc;
+      }
+      .h-table th.comp-head {
+        background: #4d1ea8;
+      }
+      .h-table th.bench-head {
+        background: #5c3fa0;
+      }
+      .section-group-label td {
+        background: #f0e5ff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--p-dark);
+        padding: 0.4rem 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--p-border);
+      }
+      /* Two-table compliance layout */
+      .compliance-tables {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+      }
+      @media (max-width: 900px) {
+        .compliance-tables {
+          grid-template-columns: 1fr;
+        }
+      }
+      .compliance-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--p-border);
+        overflow: hidden;
+      }
+      .compliance-card-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .compliance-card-header {
+        padding: 0.8rem 1.1rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .ch-nacional {
+        background: linear-gradient(135deg, #1d1a74, #4d1ea8);
+      }
+      .ch-bench {
+        background: linear-gradient(135deg, #4d1ea8, #9c38df);
+      }
 
-.route-card{background:white;border-radius:10px;border:1px solid var(--border);overflow:hidden}
-.route-card-header{background:var(--p-mid);color:white;padding:.65rem 1rem;font-size:.88rem;font-weight:600}
-.access-img{background:var(--p-pale);border:2px dashed var(--p-mid);border-radius:8px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;margin-bottom:.75rem}
-.access-img:hover{background:#E8E0FF}
-.access-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.access-img p{font-size:.82rem;color:var(--p-mid);font-weight:600}
-.access-img .overlay-btn{position:absolute;bottom:.5rem;right:.5rem;background:rgba(10,35,66,.8);color:white;border:none;border-radius:5px;padding:.3rem .6rem;font-size:.72rem;cursor:pointer}
+      .route-card {
+        background: white;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .route-card-header {
+        background: var(--p-mid);
+        color: white;
+        padding: 0.65rem 1rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
+      .access-img {
+        background: var(--p-pale);
+        border: 2px dashed var(--p-mid);
+        border-radius: 8px;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+      }
+      .access-img:hover {
+        background: #e8e0ff;
+      }
+      .access-img img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .access-img p {
+        font-size: 0.82rem;
+        color: var(--p-mid);
+        font-weight: 600;
+      }
+      .access-img .overlay-btn {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        background: rgba(10, 35, 66, 0.8);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.72rem;
+        cursor: pointer;
+      }
 
-.comp-tag{display:inline-block;background:var(--p-pale);color:var(--p-mid);border-radius:20px;padding:.18rem .6rem;font-size:.78rem;font-weight:600;margin:.15rem}
-.summary-box{font-size:.9rem;line-height:1.7;color:var(--text);background:var(--green-bg);border-left:4px solid var(--green);padding:.9rem 1.1rem;border-radius:0 8px 8px 0;margin-bottom:1.1rem}
+      .comp-tag {
+        display: inline-block;
+        background: var(--p-pale);
+        color: var(--p-mid);
+        border-radius: 20px;
+        padding: 0.18rem 0.6rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin: 0.15rem;
+      }
+      .summary-box {
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: var(--text);
+        background: var(--green-bg);
+        border-left: 4px solid var(--green);
+        padding: 0.9rem 1.1rem;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1.1rem;
+      }
 
-.zoom-map-wrap{position:relative;overflow:hidden;border-radius:10px;border:2px dashed var(--p-border);background:var(--p-pale);min-height:300px;user-select:none}
-.zoom-map-wrap.has-img{border-style:solid;background:#111}
-.zoom-map-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-origin:center center}
-.zoom-map-inner img{max-width:none;display:block;pointer-events:none}
-.zoom-map-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:.5rem;color:var(--p-mid);font-size:.85rem;font-weight:600;cursor:pointer;width:100%}
-.zoom-controls{position:absolute;bottom:.75rem;right:.75rem;display:flex;flex-direction:column;gap:.3rem;z-index:10}
-.zoom-btn{background:rgba(29,26,116,.85);color:white;border:none;border-radius:6px;width:30px;height:30px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
-.zoom-btn:hover{background:rgba(29,26,116,1)}
-.zoom-upload-btn{position:absolute;top:.6rem;right:.6rem;background:rgba(29,26,116,.8);color:white;border:none;border-radius:6px;padding:.3rem .65rem;font-size:.72rem;cursor:pointer;z-index:10}
-.field-label{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.3rem}
-input[type=text],input[type=number],textarea,select{width:100%;padding:.55rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;color:var(--text);background:white;outline:none;transition:border-color .2s}
-input:focus,textarea:focus,select:focus{border-color:var(--p-mid)}
-.form-row{margin-bottom:.9rem}
+      .zoom-map-wrap {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        border: 2px dashed var(--p-border);
+        background: var(--p-pale);
+        min-height: 300px;
+        user-select: none;
+      }
+      .zoom-map-wrap.has-img {
+        border-style: solid;
+        background: #111;
+      }
+      .zoom-map-inner {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform-origin: center center;
+      }
+      .zoom-map-inner img {
+        max-width: none;
+        display: block;
+        pointer-events: none;
+      }
+      .zoom-map-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 300px;
+        gap: 0.5rem;
+        color: var(--p-mid);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+      }
+      .zoom-controls {
+        position: absolute;
+        bottom: 0.75rem;
+        right: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        z-index: 10;
+      }
+      .zoom-btn {
+        background: rgba(29, 26, 116, 0.85);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+      .zoom-btn:hover {
+        background: rgba(29, 26, 116, 1);
+      }
+      .zoom-upload-btn {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        background: rgba(29, 26, 116, 0.8);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.3rem 0.65rem;
+        font-size: 0.72rem;
+        cursor: pointer;
+        z-index: 10;
+      }
+      .field-label {
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 0.3rem;
+      }
+      input[type='text'],
+      input[type='number'],
+      textarea,
+      select {
+        width: 100%;
+        padding: 0.55rem 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.88rem;
+        color: var(--text);
+        background: white;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: var(--p-mid);
+      }
+      .form-row {
+        margin-bottom: 0.9rem;
+      }
 
-#loading-overlay{position:fixed;inset:0;background:rgba(10,35,66,.92);z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
-.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading-overlay p{color:white;font-size:.9rem}
-#loading-overlay small{color:rgba(255,255,255,.6);font-size:.8rem}
-</style>
-</head>
-<body>
-
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <p id="loading-msg">Procesando...</p>
-  <small id="loading-sub"></small>
-</div>
-
-<div id="upload-screen">
-  <div class="upload-logo" style="font-family:Poppins,sans-serif;font-weight:800;letter-spacing:-1px">Análisis de Puntos</div>
-  <div class="upload-sub">Reporte Interactivo de Ubicaciones</div>
-  <div class="upload-card">
-    <h2>Cargar Base de Datos Excel</h2>
-    <p>Sube el archivo <strong>.xlsx</strong> con las hojas: <strong>Expansion Genie Rural</strong>, <strong>Expansion Genie Urbano</strong>, <strong>Expansion Genie Puntos</strong> y <strong>Clasificación</strong>.</p>
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-      
-      <p><strong>Haz clic para seleccionar</strong> o arrastra aquí</p>
-      <p style="font-size:.8rem;color:var(--muted);margin-top:.25rem">Excel .xlsx</p>
+      #loading-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 35, 66, 0.92);
+        z-index: 999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      #loading-overlay p {
+        color: white;
+        font-size: 0.9rem;
+      }
+      #loading-overlay small {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <p id="loading-msg">Procesando...</p>
+      <small id="loading-sub"></small>
     </div>
-    <input type="file" id="file-input" accept=".xlsx,.xls">
-    <div id="file-name"></div>
-    <div class="sheet-status" id="sheet-status" style="display:none">
-      <div style="font-size:.8rem;font-weight:700;color:var(--p-dark);margin-bottom:.4rem">Hojas detectadas:</div>
-      <div id="sheet-rows"></div>
-    </div>
-    <div id="trade-area-option" style="display:none;margin-bottom:.75rem;background:var(--p-pale);border:1px solid var(--p-border);border-radius:10px;padding:.75rem 1rem">
-      <div style="font-size:.82rem;font-weight:700;color:var(--p-dark);margin-bottom:.4rem">Tipo de análisis</div>
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.85rem"><input type="radio" name="analysis-type" value="isocrona" checked onchange="USE_TRADE_AREA=false"> Isócrona (15/20/30 min)</label>
-        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.85rem"><input type="radio" name="analysis-type" value="trade-area" onchange="USE_TRADE_AREA=true"> Trade Area</label>
+
+    <div id="upload-screen">
+      <div
+        class="upload-logo"
+        style="font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -1px"
+      >
+        Análisis de Puntos
       </div>
-    </div>
-    <button class="btn-primary" id="btn-load" style="display:none" onclick="buildReport()">Generar Reporte</button>
-    <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.9rem">
-      <button class="btn-primary" onclick="loadDemo()" style="background:var(--accent)">Cargar Datos Demo</button>
-      <div style="margin-top:.6rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
-        <button class="btn-secondary" onclick="document.getElementById('import-session-file').click()" style="font-size:.82rem">📥 Importar sesión guardada</button>
-        <input type="file" id="import-session-file" accept=".html" style="display:none" onchange="importSession(this)">
-        <span style="font-size:.75rem;color:var(--muted)">Continúa donde lo dejaste</span>
-      </div>
-      <div id="import-confirm" style="display:none"></div>
-    </div>
-    <p class="upload-hint">Los datos se procesan completamente en tu navegador.</p>
-  </div>
-</div>
-
-<div id="report-screen">
-  <div class="report-header">
-    <div style="display:flex;align-items:center;gap:.75rem"><div id="logo-wrap" onclick="document.getElementById('logo-file').click()" style="height:44px;max-width:160px;min-width:44px;border-radius:8px;border:2px dashed rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:rgba(255,255,255,.1);flex-shrink:0;padding:2px 6px" title="Clic para cambiar logo"><span id="logo-placeholder" style="font-size:.65rem;color:rgba(255,255,255,.6);text-align:center;line-height:1.2">+ Logo</span></div><input type="file" id="logo-file" accept="image/*" style="display:none" onchange="loadLogo(this)"><div class="header-logo" style="font-weight:800;letter-spacing:-0.5px">Análisis de Puntos</div></div>
-    <div class="header-actions">
-      <button class="btn-header btn-export" onclick="exportStaticHTML()">Exportar Reporte</button>
-      <button class="btn-header" onclick="saveSession()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35)">💾 Guardar sesión</button>
-      <button class="btn-header" onclick="goBack()">← Nueva Carga</button>
-    </div>
-  </div>
-
-  <div class="point-selector-bar">
-    <label>Seleccionar punto:</label>
-    <select id="point-select" onchange="switchPoint(this.value)"></select>
-    <button onclick="openAddPoint()" style="background:var(--p-mid);color:white;border:none;border-radius:8px;padding:.42rem .9rem;cursor:pointer;font-size:.88rem;font-weight:600;font-family:Poppins,sans-serif;white-space:nowrap">+ Agregar punto</button>
-    <div style="display:flex;gap:.75rem;margin-left:1rem;align-items:center;flex-wrap:wrap">
-      <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--muted);cursor:pointer;user-select:none">
-        <input type="checkbox" id="tog-overlap" checked onchange="toggleOverlap(this.checked)" style="accent-color:var(--p-mid);width:14px;height:14px">
-        Overlap
-      </label>
-      <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--muted);cursor:pointer;user-select:none">
-        <input type="checkbox" id="toggle-calificacion" checked onchange="toggleSection('s-calificacion','tab-calificacion',this.checked)" style="accent-color:var(--p-mid);width:14px;height:14px">
-        Calificación
-      </label>
-    </div>
-  </div>
-
-  <div class="nav-tabs" id="main-nav-tabs" style="position:relative">
-    <div class="nav-tab active" onclick="showSection('s-contexto',this)">Contexto</div>
-    <div class="nav-tab" onclick="showSection('s-accesibilidad',this)">Accesibilidad</div>
-    <div class="nav-tab" onclick="showSection('s-calor-trabajo',this)">Mapa Trabajo</div>
-    <div class="nav-tab" onclick="showSection('s-calor-domicilio',this)">Mapa Domicilio</div>
-    <div class="nav-tab" onclick="showSection('s-calor-general',this)">Mapa de Calor</div>
-    <div class="nav-tab" onclick="showSection('s-rutas-calientes',this)">Rutas Calientes</div>
-    <div class="nav-tab" id="tab-15min" onclick="showSection('s-15min',this)">Cumplimiento 15 min</div>
-    <div class="nav-tab" id="tab-20min" onclick="showSection('s-20min',this)">Cumplimiento 20 min</div>
-    <div class="nav-tab" id="tab-30min" onclick="showSection('s-30min',this)">Cumplimiento 30 min</div>
-    <div class="nav-tab" onclick="showSection('s-comparables',this)">Comparables</div>
-    <div class="nav-tab" id="tab-overlap" onclick="showSection('s-overlap',this)">Overlap</div>
-    <div class="nav-tab" id="tab-calificacion" onclick="showSection('s-calificacion',this)">Calificación</div>
-    <div class="nav-tab" onclick="showSection('s-hallazgos',this)">Hallazgos</div>
-    <div class="nav-tab" onclick="showSection('s-confidencialidad',this)">Confidencialidad</div>
-    <div class="nav-tab" id="apartados-btn" onclick="toggleManagePanel()" style="margin-left:auto;color:var(--p-mid);font-weight:700" title="Mostrar u ocultar apartados">⚙ Apartados</div>
-  </div>
-  <div id="manage-panel" style="display:none;position:fixed;right:1.5rem;top:100px;z-index:300;background:white;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 28px rgba(29,26,116,.18);padding:.6rem .25rem;min-width:230px;max-height:65vh;overflow:auto"></div>
-
-  <div class="content-area">
-
-    <div class="section active" id="s-contexto">
-      <div class="hero-banner" id="hero-banner">
-        
-        <div class="hero-text">
-          <h1 id="ctx-nombre">—</h1>
-          <p id="ctx-subtitulo"></p>
-          <div class="hero-meta" id="hero-meta"></div>
+      <div class="upload-sub">Reporte Interactivo de Ubicaciones</div>
+      <div class="upload-card">
+        <h2>Cargar Base de Datos Excel</h2>
+        <p>
+          Sube el archivo <strong>.xlsx</strong> con las hojas:
+          <strong>Expansion Genie Rural</strong>, <strong>Expansion Genie Urbano</strong>,
+          <strong>Expansion Genie Puntos</strong> y <strong>Clasificación</strong>.
+        </p>
+        <div
+          class="drop-zone"
+          id="drop-zone"
+          onclick="document.getElementById('file-input').click()"
+        >
+          <p><strong>Haz clic para seleccionar</strong> o arrastra aquí</p>
+          <p style="font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem">Excel .xlsx</p>
         </div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">Ubicación</div>
-          <div class="card-body">
-            <div class="map-placeholder" id="map-main" onclick="triggerImg('img-mapa-main')">
-              <p>Haz clic para subir imagen</p><small>PNG · JPG · WebP</small>
-            </div>
-            <input type="file" id="img-mapa-main" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-main')">
-            <div class="map-placeholder" id="map-main2" onclick="triggerImg('img-mapa-main2')" style="min-height:180px;margin-top:.75rem">
-              <span style="font-size:1.5rem;opacity:.4">🗺</span><p style="font-size:.82rem">Imagen 2 (opcional)</p><small>PNG · JPG · WebP</small></div>
-            <input type="file" id="img-mapa-main2" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-main2')">
+        <input type="file" id="file-input" accept=".xlsx,.xls" />
+        <div id="file-name"></div>
+        <div class="sheet-status" id="sheet-status" style="display: none">
+          <div
+            style="font-size: 0.8rem; font-weight: 700; color: var(--p-dark); margin-bottom: 0.4rem"
+          >
+            Hojas detectadas:
+          </div>
+          <div id="sheet-rows"></div>
+        </div>
+        <div
+          id="trade-area-option"
+          style="
+            display: none;
+            margin-bottom: 0.75rem;
+            background: var(--p-pale);
+            border: 1px solid var(--p-border);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+          "
+        >
+          <div
+            style="
+              font-size: 0.82rem;
+              font-weight: 700;
+              color: var(--p-dark);
+              margin-bottom: 0.4rem;
+            "
+          >
+            Tipo de análisis
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                cursor: pointer;
+                font-size: 0.85rem;
+              "
+              ><input
+                type="radio"
+                name="analysis-type"
+                value="isocrona"
+                checked
+                onchange="USE_TRADE_AREA=false"
+              />
+              Isócrona (15/20/30 min)</label
+            >
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                cursor: pointer;
+                font-size: 0.85rem;
+              "
+              ><input
+                type="radio"
+                name="analysis-type"
+                value="trade-area"
+                onchange="USE_TRADE_AREA=true"
+              />
+              Trade Area</label
+            >
           </div>
         </div>
-        <div class="card">
-          <div class="card-header">Contexto del Sitio</div>
-          <div class="card-body">
-            <div class="editable-text" id="ctx-descripcion" contenteditable="true">Cargando contexto...</div>
-            <div class="editable-hint">✏️ Haz clic para editar</div>
-            <div class="form-row" style="margin-top:.9rem">
-              <div class="field-label">Fuente</div>
-              <input type="text" id="ctx-fuente" value="Expansion Genie / Investigación Interna">
-            </div>
+        <button class="btn-primary" id="btn-load" style="display: none" onclick="buildReport()">
+          Generar Reporte
+        </button>
+        <div style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 0.9rem">
+          <button class="btn-primary" onclick="loadDemo()" style="background: var(--accent)">
+            Cargar Datos Demo
+          </button>
+          <div
+            style="
+              margin-top: 0.6rem;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              class="btn-secondary"
+              onclick="document.getElementById('import-session-file').click()"
+              style="font-size: 0.82rem"
+            >
+              📥 Importar sesión guardada
+            </button>
+            <input
+              type="file"
+              id="import-session-file"
+              accept=".html"
+              style="display: none"
+              onchange="importSession(this)"
+            />
+            <span style="font-size: 0.75rem; color: var(--muted)">Continúa donde lo dejaste</span>
           </div>
+          <div id="import-confirm" style="display: none"></div>
         </div>
+        <p class="upload-hint">Los datos se procesan completamente en tu navegador.</p>
       </div>
     </div>
 
-    <div class="section" id="s-accesibilidad">
-      <div class="section-title">Accesibilidad del Punto</div>
-      <div class="card" style="margin-bottom:1.25rem">
-        <div class="card-header">Descripción General de Accesos</div>
-        <div class="card-body">
-          <div class="editable-text" id="acc-descripcion" contenteditable="true">Se presentan los accesos de entrada y salida al punto. Actualmente es posible entrar y salir sin restricciones.</div>
-          <div class="editable-hint">✏️ Edita para describir los accesos</div>
+    <div id="report-screen">
+      <div class="report-header">
+        <div style="display: flex; align-items: center; gap: 0.75rem">
+          <div
+            id="logo-wrap"
+            onclick="document.getElementById('logo-file').click()"
+            style="
+              height: 44px;
+              max-width: 160px;
+              min-width: 44px;
+              border-radius: 8px;
+              border: 2px dashed rgba(255, 255, 255, 0.4);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              overflow: hidden;
+              background: rgba(255, 255, 255, 0.1);
+              flex-shrink: 0;
+              padding: 2px 6px;
+            "
+            title="Clic para cambiar logo"
+          >
+            <span
+              id="logo-placeholder"
+              style="
+                font-size: 0.65rem;
+                color: rgba(255, 255, 255, 0.6);
+                text-align: center;
+                line-height: 1.2;
+              "
+              >+ Logo</span
+            >
+          </div>
+          <input
+            type="file"
+            id="logo-file"
+            accept="image/*"
+            style="display: none"
+            onchange="loadLogo(this)"
+          />
+          <div class="header-logo" style="font-weight: 800; letter-spacing: -0.5px">
+            Análisis de Puntos
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-header btn-export" onclick="exportStaticHTML()">
+            Exportar Reporte
+          </button>
+          <button
+            class="btn-header"
+            onclick="saveSession()"
+            style="
+              background: rgba(255, 255, 255, 0.15);
+              border: 1px solid rgba(255, 255, 255, 0.35);
+            "
+          >
+            💾 Guardar sesión
+          </button>
+          <button class="btn-header" onclick="goBack()">← Nueva Carga</button>
         </div>
       </div>
-      <div class="grid-2" id="acceso-grid"></div>
-      <div class="card" style="margin-top:1rem">
-        <div class="card-header teal">Agregar Ruta de Acceso</div>
-        <div class="card-body">
+
+      <div class="point-selector-bar">
+        <label>Seleccionar punto:</label>
+        <select id="point-select" onchange="switchPoint(this.value)"></select>
+        <button
+          onclick="openAddPoint()"
+          style="
+            background: var(--p-mid);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.42rem 0.9rem;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: Poppins, sans-serif;
+            white-space: nowrap;
+          "
+        >
+          + Agregar punto
+        </button>
+        <div
+          style="
+            display: flex;
+            gap: 0.75rem;
+            margin-left: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+          "
+        >
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.35rem;
+              font-size: 0.8rem;
+              color: var(--muted);
+              cursor: pointer;
+              user-select: none;
+            "
+          >
+            <input
+              type="checkbox"
+              id="tog-overlap"
+              checked
+              onchange="toggleOverlap(this.checked)"
+              style="accent-color: var(--p-mid); width: 14px; height: 14px"
+            />
+            Overlap
+          </label>
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.35rem;
+              font-size: 0.8rem;
+              color: var(--muted);
+              cursor: pointer;
+              user-select: none;
+            "
+          >
+            <input
+              type="checkbox"
+              id="toggle-calificacion"
+              checked
+              onchange="toggleSection('s-calificacion','tab-calificacion',this.checked)"
+              style="accent-color: var(--p-mid); width: 14px; height: 14px"
+            />
+            Calificación
+          </label>
+        </div>
+      </div>
+
+      <div class="nav-tabs" id="main-nav-tabs" style="position: relative">
+        <div class="nav-tab active" onclick="showSection('s-contexto',this)">Contexto</div>
+        <div class="nav-tab" onclick="showSection('s-accesibilidad',this)">Accesibilidad</div>
+        <div class="nav-tab" onclick="showSection('s-calor-trabajo',this)">Mapa Trabajo</div>
+        <div class="nav-tab" onclick="showSection('s-calor-domicilio',this)">Mapa Domicilio</div>
+        <div class="nav-tab" onclick="showSection('s-calor-general',this)">Mapa de Calor</div>
+        <div class="nav-tab" onclick="showSection('s-rutas-calientes',this)">Rutas Calientes</div>
+        <div class="nav-tab" id="tab-15min" onclick="showSection('s-15min',this)">
+          Cumplimiento 15 min
+        </div>
+        <div class="nav-tab" id="tab-20min" onclick="showSection('s-20min',this)">
+          Cumplimiento 20 min
+        </div>
+        <div class="nav-tab" id="tab-30min" onclick="showSection('s-30min',this)">
+          Cumplimiento 30 min
+        </div>
+        <div class="nav-tab" onclick="showSection('s-comparables',this)">Comparables</div>
+        <div class="nav-tab" id="tab-overlap" onclick="showSection('s-overlap',this)">Overlap</div>
+        <div class="nav-tab" id="tab-calificacion" onclick="showSection('s-calificacion',this)">
+          Calificación
+        </div>
+        <div class="nav-tab" onclick="showSection('s-hallazgos',this)">Hallazgos</div>
+        <div class="nav-tab" onclick="showSection('s-confidencialidad',this)">Confidencialidad</div>
+        <div
+          class="nav-tab"
+          id="apartados-btn"
+          onclick="toggleManagePanel()"
+          style="margin-left: auto; color: var(--p-mid); font-weight: 700"
+          title="Mostrar u ocultar apartados"
+        >
+          ⚙ Apartados
+        </div>
+      </div>
+      <div
+        id="manage-panel"
+        style="
+          display: none;
+          position: fixed;
+          right: 1.5rem;
+          top: 100px;
+          z-index: 300;
+          background: white;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          box-shadow: 0 8px 28px rgba(29, 26, 116, 0.18);
+          padding: 0.6rem 0.25rem;
+          min-width: 230px;
+          max-height: 65vh;
+          overflow: auto;
+        "
+      ></div>
+
+      <div class="content-area">
+        <div class="section active" id="s-contexto">
+          <div class="hero-banner" id="hero-banner">
+            <div class="hero-text">
+              <h1 id="ctx-nombre">—</h1>
+              <p id="ctx-subtitulo"></p>
+              <div class="hero-meta" id="hero-meta"></div>
+            </div>
+          </div>
           <div class="grid-2">
-            <div class="form-row"><div class="field-label">Nombre de la ruta</div><input type="text" id="new-route-name" placeholder="Ej. Entrada desde Av. Principal"></div>
-            <div class="form-row"><div class="field-label">Descripción</div><input type="text" id="new-route-desc" placeholder="Descripción del acceso"></div>
-          </div>
-          <button class="btn-primary" style="max-width:180px;margin-top:.5rem" onclick="addRoute()">+ Agregar</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" id="s-calor-trabajo">
-      <div class="section-title">Mapa de Calor — Trabajo</div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">Mapa de Calor Trabajo</div>
-          <div class="card-body">
-            <div class="map-placeholder" id="map-trabajo" onclick="triggerImg('img-trabajo')">
-              <p>Subir imagen</p><small>Mapa calor laboral</small>
-            </div>
-            <input type="file" id="img-trabajo" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-trabajo')">
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header">Características — Trabajo</div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="field-label">Competidores</div>
-              <input type="text" id="trabajo-comp-input" placeholder="Separados por | (ej: Tienda A | Tienda B)" oninput="updateTags('trabajo',this.value)">
-              <div id="trabajo-tags" style="margin-top:.5rem;min-height:28px"></div>
-            </div>
-            <div class="form-row" style="margin-top:.75rem">
-              <div class="field-label">Concentraciones / descripción</div>
-              <div class="editable-text" id="trabajo-concentracion" contenteditable="true">En horario laboral la zona atiende principalmente a la población del área norte y sur de la ciudad.</div>
-              <div class="editable-hint">✏️ Edita para detallar concentraciones</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" id="s-calor-domicilio">
-      <div class="section-title">Mapa de Calor — Domicilio</div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">Mapa de Calor Domicilio</div>
-          <div class="card-body">
-            <div class="map-placeholder" id="map-domicilio" onclick="triggerImg('img-domicilio')">
-              <p>Subir imagen</p><small>Mapa calor residencial</small>
-            </div>
-            <input type="file" id="img-domicilio" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-domicilio')">
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header">Características — Domicilio</div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="field-label">Competidores</div>
-              <input type="text" id="domicilio-comp-input" placeholder="Separados por | (ej: Tienda A | Tienda B)" oninput="updateTags('domicilio',this.value)">
-              <div id="domicilio-tags" style="margin-top:.5rem;min-height:28px"></div>
-            </div>
-            <div class="form-row" style="margin-top:.75rem">
-              <div class="field-label">Concentraciones / descripción</div>
-              <div class="editable-text" id="domicilio-concentracion" contenteditable="true">En horario de domicilio atiende principalmente a residentes de la zona sur de la ciudad.</div>
-              <div class="editable-hint">✏️ Edita para detallar concentraciones</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" id="s-calor-general">
-      <div class="section-title">Mapa de Calor</div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">Mapa de Calor</div>
-          <div class="card-body">
-            <div class="map-placeholder" id="map-general" onclick="triggerImg('img-general')">
-              <p>Subir imagen</p><small>Mapa de calor</small>
-            </div>
-            <input type="file" id="img-general" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-general')">
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header">Características</div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="field-label">Competidores</div>
-              <input type="text" id="general-comp-input" placeholder="Separados por | (ej: Tienda A | Tienda B)" oninput="updateTags('general',this.value)">
-              <div id="general-tags" style="margin-top:.5rem;min-height:28px"></div>
-            </div>
-            <div class="form-row" style="margin-top:.75rem">
-              <div class="field-label">Concentraciones / descripción</div>
-              <div class="editable-text" id="general-concentracion" contenteditable="true">Describe aquí las concentraciones del mapa de calor.</div>
-              <div class="editable-hint">✏️ Edita para detallar concentraciones</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" id="s-rutas-calientes">
-      <div class="section-title">Rutas Calientes</div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">Rutas Calientes</div>
-          <div class="card-body">
-            <div class="map-placeholder" id="map-rutas" onclick="triggerImg('img-rutas')">
-              <p>Subir imagen</p><small>Mapa de rutas calientes</small>
-            </div>
-            <input type="file" id="img-rutas" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-rutas')">
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header">Características</div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="field-label">Competidores</div>
-              <input type="text" id="rutas-comp-input" placeholder="Separados por | (ej: Tienda A | Tienda B)" oninput="updateTags('rutas',this.value)">
-              <div id="rutas-tags" style="margin-top:.5rem;min-height:28px"></div>
-            </div>
-            <div class="form-row" style="margin-top:.75rem">
-              <div class="field-label">Concentraciones / descripción</div>
-              <div class="editable-text" id="rutas-concentracion" contenteditable="true">Describe aquí las rutas calientes de la zona.</div>
-              <div class="editable-hint">✏️ Edita para detallar rutas</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" id="s-15min"><div class="section-title">Cumplimiento — 15 min</div><div id="compliance-15"></div></div>
-    <div class="section" id="s-20min"><div class="section-title">Cumplimiento — 20 min</div><div id="compliance-20"></div></div>
-    <div class="section" id="s-30min"><div class="section-title">Cumplimiento — 30 min</div><div id="compliance-30"></div></div>
-
-    <div class="section" id="s-overlap">
-      <div class="section-title">Overlap Visitantes del Sitio</div>
-
-      <div class="grid-2" style="margin-bottom:1.25rem">
-        <!-- LEFT: map image -->
-        <div class="card">
-          <div class="card-header">Mapa de Overlap</div>
-          <div class="card-body" style="padding:.75rem">
-            <div class="map-placeholder" id="map-overlap-1" onclick="triggerImg('img-overlap-1')" style="min-height:280px">
-              <div class="map-icon">🗺️</div><p>Subir imagen del mapa</p><small>PNG · JPG</small>
-            </div>
-            <input type="file" id="img-overlap-1" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-overlap-1')">
-          </div>
-        </div>
-        <!-- RIGHT: gauge + data -->
-        <div class="card">
-          <div class="card-header">Indicadores de Overlap</div>
-          <div class="card-body">
-            <!-- Gauge -->
-            <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:1.25rem">
-              <canvas id="overlap-gauge" width="240" height="130" style="display:block"></canvas>
-              <div style="display:flex;justify-content:space-around;width:240px;margin-top:.5rem">
-                <div style="text-align:center">
-                  <div style="font-size:.72rem;color:var(--muted);margin-bottom:.3rem">Overlap</div>
-                  <div style="border:1.5px solid var(--p-border);border-radius:20px;padding:.25rem .9rem;font-size:.88rem;font-weight:700;color:var(--p-dark)" id="overlap-pct-display">0%</div>
+            <div class="card">
+              <div class="card-header">Ubicación</div>
+              <div class="card-body">
+                <div class="map-placeholder" id="map-main" onclick="triggerImg('img-mapa-main')">
+                  <p>Haz clic para subir imagen</p>
+                  <small>PNG · JPG · WebP</small>
                 </div>
-                <div style="text-align:center">
-                  <div style="font-size:.72rem;color:var(--muted);margin-bottom:.3rem">Overlap Visitantes</div>
-                  <div style="border:1.5px solid var(--p-mid);border-radius:20px;padding:.25rem .9rem;font-size:.88rem;font-weight:700;color:var(--p-mid);background:var(--p-pale)" id="overlap-vis-display">0%</div>
+                <input
+                  type="file"
+                  id="img-mapa-main"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-main')"
+                />
+                <div
+                  class="map-placeholder"
+                  id="map-main2"
+                  onclick="triggerImg('img-mapa-main2')"
+                  style="min-height: 180px; margin-top: 0.75rem"
+                >
+                  <span style="font-size: 1.5rem; opacity: 0.4">🗺</span>
+                  <p style="font-size: 0.82rem">Imagen 2 (opcional)</p>
+                  <small>PNG · JPG · WebP</small>
+                </div>
+                <input
+                  type="file"
+                  id="img-mapa-main2"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-main2')"
+                />
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">Contexto del Sitio</div>
+              <div class="card-body">
+                <!-- prettier-ignore -->
+                <div class="editable-text" id="ctx-descripcion" contenteditable="true">Cargando contexto...</div>
+                <div class="editable-hint">✏️ Haz clic para editar</div>
+                <div class="form-row" style="margin-top: 0.9rem">
+                  <div class="field-label">Fuente</div>
+                  <input
+                    type="text"
+                    id="ctx-fuente"
+                    value="Expansion Genie / Investigación Interna"
+                  />
                 </div>
               </div>
             </div>
-            <!-- Inputs -->
-            <div class="grid-2" style="margin-bottom:1rem">
-              <div class="form-row">
-                <div class="field-label">Overlap (%)</div>
-                <input type="number" id="overlap-pct" min="0" max="100" value="0" oninput="updateGauge()">
-              </div>
-              <div class="form-row">
-                <div class="field-label">Overlap Visitantes (%)</div>
-                <input type="number" id="overlap-vis" min="0" max="100" value="0" oninput="updateGauge()">
-              </div>
-            </div>
-            <!-- Table -->
-            <div class="field-label" style="margin-bottom:.5rem">Tiendas cercanas</div>
-            <table id="overlap-table" style="width:100%;border-collapse:collapse;font-size:.82rem;table-layout:auto">
-              <thead>
-                <tr>
-                  <th style="background:var(--p-dark);color:white;padding:.5rem .75rem;text-align:left;font-weight:600;min-width:140px">Tienda</th>
-                  <th style="background:var(--p-dark);color:white;padding:.5rem .75rem;text-align:center;font-weight:600">Distancia (km)</th>
-                  <th style="background:var(--p-dark);color:white;padding:.5rem .75rem;text-align:center;font-weight:600">Overlap Visitantes</th>
-                  <th style="background:var(--p-dark);color:white;padding:.5rem .75rem;text-align:center;width:32px"></th>
-                </tr>
-              </thead>
-              <tbody id="overlap-tbody">
-                <tr data-row="0">
-                  <td style="padding:.45rem .75rem;border-bottom:1px solid var(--p-border)"><input type="text" placeholder="Nombre tienda" style="border:none;background:transparent;font-size:.82rem;width:100%;outline:none"></td>
-                  <td style="padding:.45rem .75rem;border-bottom:1px solid var(--p-border)"><input type="number" placeholder="0" style="border:none;background:transparent;font-size:.82rem;width:60px;text-align:center;outline:none"></td>
-                  <td style="padding:.45rem .75rem;border-bottom:1px solid var(--p-border);color:var(--p-mid);font-weight:700"><input type="text" placeholder="0%" style="border:none;background:transparent;font-size:.82rem;width:50px;text-align:center;outline:none;color:var(--p-mid);font-weight:700"></td>
-                  <td style="padding:.45rem .5rem;border-bottom:1px solid var(--p-border);text-align:center"><button onclick="removeOverlapRow(this)" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.9rem">✕</button></td>
-                </tr>
-              </tbody>
-            </table>
-            <button onclick="addOverlapRow()" style="margin-top:.6rem;background:none;border:1px dashed var(--p-border);border-radius:6px;padding:.35rem .85rem;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:Poppins,sans-serif">+ Agregar fila</button>
           </div>
         </div>
-      </div>
 
-      <!-- Description text -->
-      <div class="card">
-        <div class="card-header">Descripción del Overlap</div>
-        <div class="card-body">
-          <div class="editable-text" id="overlap-desc" contenteditable="true" style="min-height:80px;line-height:1.8">
+        <div class="section" id="s-accesibilidad">
+          <div class="section-title">Accesibilidad del Punto</div>
+          <div class="card" style="margin-bottom: 1.25rem">
+            <div class="card-header">Descripción General de Accesos</div>
+            <div class="card-body">
+              <!-- prettier-ignore -->
+              <div class="editable-text" id="acc-descripcion" contenteditable="true">Se presentan los accesos de entrada y salida al punto. Actualmente es posible entrar y salir sin restricciones.</div>
+              <div class="editable-hint">✏️ Edita para describir los accesos</div>
+            </div>
+          </div>
+          <div class="grid-2" id="acceso-grid"></div>
+          <div class="card" style="margin-top: 1rem">
+            <div class="card-header teal">Agregar Ruta de Acceso</div>
+            <div class="card-body">
+              <div class="grid-2">
+                <div class="form-row">
+                  <div class="field-label">Nombre de la ruta</div>
+                  <input
+                    type="text"
+                    id="new-route-name"
+                    placeholder="Ej. Entrada desde Av. Principal"
+                  />
+                </div>
+                <div class="form-row">
+                  <div class="field-label">Descripción</div>
+                  <input type="text" id="new-route-desc" placeholder="Descripción del acceso" />
+                </div>
+              </div>
+              <button
+                class="btn-primary"
+                style="max-width: 180px; margin-top: 0.5rem"
+                onclick="addRoute()"
+              >
+                + Agregar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" id="s-calor-trabajo">
+          <div class="section-title">Mapa de Calor — Trabajo</div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">Mapa de Calor Trabajo</div>
+              <div class="card-body">
+                <div class="map-placeholder" id="map-trabajo" onclick="triggerImg('img-trabajo')">
+                  <p>Subir imagen</p>
+                  <small>Mapa calor laboral</small>
+                </div>
+                <input
+                  type="file"
+                  id="img-trabajo"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-trabajo')"
+                />
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">Características — Trabajo</div>
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="field-label">Competidores</div>
+                  <input
+                    type="text"
+                    id="trabajo-comp-input"
+                    placeholder="Separados por | (ej: Tienda A | Tienda B)"
+                    oninput="updateTags('trabajo',this.value)"
+                  />
+                  <div id="trabajo-tags" style="margin-top: 0.5rem; min-height: 28px"></div>
+                </div>
+                <div class="form-row" style="margin-top: 0.75rem">
+                  <div class="field-label">Concentraciones / descripción</div>
+                  <!-- prettier-ignore -->
+                  <div class="editable-text" id="trabajo-concentracion" contenteditable="true">En horario laboral la zona atiende principalmente a la población del área norte y sur de la ciudad.</div>
+                  <div class="editable-hint">✏️ Edita para detallar concentraciones</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" id="s-calor-domicilio">
+          <div class="section-title">Mapa de Calor — Domicilio</div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">Mapa de Calor Domicilio</div>
+              <div class="card-body">
+                <div
+                  class="map-placeholder"
+                  id="map-domicilio"
+                  onclick="triggerImg('img-domicilio')"
+                >
+                  <p>Subir imagen</p>
+                  <small>Mapa calor residencial</small>
+                </div>
+                <input
+                  type="file"
+                  id="img-domicilio"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-domicilio')"
+                />
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">Características — Domicilio</div>
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="field-label">Competidores</div>
+                  <input
+                    type="text"
+                    id="domicilio-comp-input"
+                    placeholder="Separados por | (ej: Tienda A | Tienda B)"
+                    oninput="updateTags('domicilio',this.value)"
+                  />
+                  <div id="domicilio-tags" style="margin-top: 0.5rem; min-height: 28px"></div>
+                </div>
+                <div class="form-row" style="margin-top: 0.75rem">
+                  <div class="field-label">Concentraciones / descripción</div>
+                  <!-- prettier-ignore -->
+                  <div class="editable-text" id="domicilio-concentracion" contenteditable="true">En horario de domicilio atiende principalmente a residentes de la zona sur de la ciudad.</div>
+                  <div class="editable-hint">✏️ Edita para detallar concentraciones</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" id="s-calor-general">
+          <div class="section-title">Mapa de Calor</div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">Mapa de Calor</div>
+              <div class="card-body">
+                <div class="map-placeholder" id="map-general" onclick="triggerImg('img-general')">
+                  <p>Subir imagen</p>
+                  <small>Mapa de calor</small>
+                </div>
+                <input
+                  type="file"
+                  id="img-general"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-general')"
+                />
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">Características</div>
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="field-label">Competidores</div>
+                  <input
+                    type="text"
+                    id="general-comp-input"
+                    placeholder="Separados por | (ej: Tienda A | Tienda B)"
+                    oninput="updateTags('general',this.value)"
+                  />
+                  <div id="general-tags" style="margin-top: 0.5rem; min-height: 28px"></div>
+                </div>
+                <div class="form-row" style="margin-top: 0.75rem">
+                  <div class="field-label">Concentraciones / descripción</div>
+                  <!-- prettier-ignore -->
+                  <div class="editable-text" id="general-concentracion" contenteditable="true">Describe aquí las concentraciones del mapa de calor.</div>
+                  <div class="editable-hint">✏️ Edita para detallar concentraciones</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" id="s-rutas-calientes">
+          <div class="section-title">Rutas Calientes</div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">Rutas Calientes</div>
+              <div class="card-body">
+                <div class="map-placeholder" id="map-rutas" onclick="triggerImg('img-rutas')">
+                  <p>Subir imagen</p>
+                  <small>Mapa de rutas calientes</small>
+                </div>
+                <input
+                  type="file"
+                  id="img-rutas"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-rutas')"
+                />
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">Características</div>
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="field-label">Competidores</div>
+                  <input
+                    type="text"
+                    id="rutas-comp-input"
+                    placeholder="Separados por | (ej: Tienda A | Tienda B)"
+                    oninput="updateTags('rutas',this.value)"
+                  />
+                  <div id="rutas-tags" style="margin-top: 0.5rem; min-height: 28px"></div>
+                </div>
+                <div class="form-row" style="margin-top: 0.75rem">
+                  <div class="field-label">Concentraciones / descripción</div>
+                  <!-- prettier-ignore -->
+                  <div class="editable-text" id="rutas-concentracion" contenteditable="true">Describe aquí las rutas calientes de la zona.</div>
+                  <div class="editable-hint">✏️ Edita para detallar rutas</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" id="s-15min">
+          <div class="section-title">Cumplimiento — 15 min</div>
+          <div id="compliance-15"></div>
+        </div>
+        <div class="section" id="s-20min">
+          <div class="section-title">Cumplimiento — 20 min</div>
+          <div id="compliance-20"></div>
+        </div>
+        <div class="section" id="s-30min">
+          <div class="section-title">Cumplimiento — 30 min</div>
+          <div id="compliance-30"></div>
+        </div>
+
+        <div class="section" id="s-overlap">
+          <div class="section-title">Overlap Visitantes del Sitio</div>
+
+          <div class="grid-2" style="margin-bottom: 1.25rem">
+            <!-- LEFT: map image -->
+            <div class="card">
+              <div class="card-header">Mapa de Overlap</div>
+              <div class="card-body" style="padding: 0.75rem">
+                <div
+                  class="map-placeholder"
+                  id="map-overlap-1"
+                  onclick="triggerImg('img-overlap-1')"
+                  style="min-height: 280px"
+                >
+                  <div class="map-icon">🗺️</div>
+                  <p>Subir imagen del mapa</p>
+                  <small>PNG · JPG</small>
+                </div>
+                <input
+                  type="file"
+                  id="img-overlap-1"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-overlap-1')"
+                />
+              </div>
+            </div>
+            <!-- RIGHT: gauge + data -->
+            <div class="card">
+              <div class="card-header">Indicadores de Overlap</div>
+              <div class="card-body">
+                <!-- Gauge -->
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-bottom: 1.25rem;
+                  "
+                >
+                  <canvas
+                    id="overlap-gauge"
+                    width="240"
+                    height="130"
+                    style="display: block"
+                  ></canvas>
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-around;
+                      width: 240px;
+                      margin-top: 0.5rem;
+                    "
+                  >
+                    <div style="text-align: center">
+                      <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 0.3rem">
+                        Overlap
+                      </div>
+                      <div
+                        style="
+                          border: 1.5px solid var(--p-border);
+                          border-radius: 20px;
+                          padding: 0.25rem 0.9rem;
+                          font-size: 0.88rem;
+                          font-weight: 700;
+                          color: var(--p-dark);
+                        "
+                        id="overlap-pct-display"
+                      >
+                        0%
+                      </div>
+                    </div>
+                    <div style="text-align: center">
+                      <div style="font-size: 0.72rem; color: var(--muted); margin-bottom: 0.3rem">
+                        Overlap Visitantes
+                      </div>
+                      <div
+                        style="
+                          border: 1.5px solid var(--p-mid);
+                          border-radius: 20px;
+                          padding: 0.25rem 0.9rem;
+                          font-size: 0.88rem;
+                          font-weight: 700;
+                          color: var(--p-mid);
+                          background: var(--p-pale);
+                        "
+                        id="overlap-vis-display"
+                      >
+                        0%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Inputs -->
+                <div class="grid-2" style="margin-bottom: 1rem">
+                  <div class="form-row">
+                    <div class="field-label">Overlap (%)</div>
+                    <input
+                      type="number"
+                      id="overlap-pct"
+                      min="0"
+                      max="100"
+                      value="0"
+                      oninput="updateGauge()"
+                    />
+                  </div>
+                  <div class="form-row">
+                    <div class="field-label">Overlap Visitantes (%)</div>
+                    <input
+                      type="number"
+                      id="overlap-vis"
+                      min="0"
+                      max="100"
+                      value="0"
+                      oninput="updateGauge()"
+                    />
+                  </div>
+                </div>
+                <!-- Table -->
+                <div class="field-label" style="margin-bottom: 0.5rem">Tiendas cercanas</div>
+                <table
+                  id="overlap-table"
+                  style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.82rem;
+                    table-layout: auto;
+                  "
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style="
+                          background: var(--p-dark);
+                          color: white;
+                          padding: 0.5rem 0.75rem;
+                          text-align: left;
+                          font-weight: 600;
+                          min-width: 140px;
+                        "
+                      >
+                        Tienda
+                      </th>
+                      <th
+                        style="
+                          background: var(--p-dark);
+                          color: white;
+                          padding: 0.5rem 0.75rem;
+                          text-align: center;
+                          font-weight: 600;
+                        "
+                      >
+                        Distancia (km)
+                      </th>
+                      <th
+                        style="
+                          background: var(--p-dark);
+                          color: white;
+                          padding: 0.5rem 0.75rem;
+                          text-align: center;
+                          font-weight: 600;
+                        "
+                      >
+                        Overlap Visitantes
+                      </th>
+                      <th
+                        style="
+                          background: var(--p-dark);
+                          color: white;
+                          padding: 0.5rem 0.75rem;
+                          text-align: center;
+                          width: 32px;
+                        "
+                      ></th>
+                    </tr>
+                  </thead>
+                  <tbody id="overlap-tbody">
+                    <tr data-row="0">
+                      <td
+                        style="padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--p-border)"
+                      >
+                        <input
+                          type="text"
+                          placeholder="Nombre tienda"
+                          style="
+                            border: none;
+                            background: transparent;
+                            font-size: 0.82rem;
+                            width: 100%;
+                            outline: none;
+                          "
+                        />
+                      </td>
+                      <td
+                        style="padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--p-border)"
+                      >
+                        <input
+                          type="number"
+                          placeholder="0"
+                          style="
+                            border: none;
+                            background: transparent;
+                            font-size: 0.82rem;
+                            width: 60px;
+                            text-align: center;
+                            outline: none;
+                          "
+                        />
+                      </td>
+                      <td
+                        style="
+                          padding: 0.45rem 0.75rem;
+                          border-bottom: 1px solid var(--p-border);
+                          color: var(--p-mid);
+                          font-weight: 700;
+                        "
+                      >
+                        <input
+                          type="text"
+                          placeholder="0%"
+                          style="
+                            border: none;
+                            background: transparent;
+                            font-size: 0.82rem;
+                            width: 50px;
+                            text-align: center;
+                            outline: none;
+                            color: var(--p-mid);
+                            font-weight: 700;
+                          "
+                        />
+                      </td>
+                      <td
+                        style="
+                          padding: 0.45rem 0.5rem;
+                          border-bottom: 1px solid var(--p-border);
+                          text-align: center;
+                        "
+                      >
+                        <button
+                          onclick="removeOverlapRow(this)"
+                          style="
+                            background: none;
+                            border: none;
+                            color: var(--red);
+                            cursor: pointer;
+                            font-size: 0.9rem;
+                          "
+                        >
+                          ✕
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button
+                  onclick="addOverlapRow()"
+                  style="
+                    margin-top: 0.6rem;
+                    background: none;
+                    border: 1px dashed var(--p-border);
+                    border-radius: 6px;
+                    padding: 0.35rem 0.85rem;
+                    font-size: 0.78rem;
+                    color: var(--muted);
+                    cursor: pointer;
+                    font-family: Poppins, sans-serif;
+                  "
+                >
+                  + Agregar fila
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description text -->
+          <div class="card">
+            <div class="card-header">Descripción del Overlap</div>
+            <div class="card-body">
+              <!-- prettier-ignore -->
+              <div class="editable-text" id="overlap-desc" contenteditable="true" style="min-height:80px;line-height:1.8">
             Se presenta el porcentaje de personas que ya visitan los restaurantes existentes y que además viven dentro del área de cobertura de la ubicación propuesta. Existe un porcentaje de Overlap Visitantes de X%, por lo que, al agregar el nuevo proyecto, los restaurantes existentes debe ser capaces de soportar tal canibalización.
           </div>
-          <div class="editable-hint">✏️ Haz clic para editar</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" id="s-calificacion">
-      <div class="section-title">Calificación del Punto</div>
-
-      <div class="grid-2" style="margin-bottom:1.25rem">
-        <!-- Map -->
-        <div class="card">
-          <div class="card-header">Mapa</div>
-          <div class="card-body" style="padding:.75rem">
-            <div class="map-placeholder" id="map-calificacion" onclick="triggerImg('img-cal')" style="min-height:280px">
-              <div class="map-icon">🗺️</div><p>Subir imagen del mapa</p><small>PNG · JPG</small>
+              <div class="editable-hint">✏️ Haz clic para editar</div>
             </div>
-            <input type="file" id="img-cal" accept="image/*" style="display:none" onchange="loadImgTo(this,'map-calificacion')">
           </div>
         </div>
 
-        <!-- Table + score -->
-        <div class="card">
-          <div class="card-header" style="justify-content:space-between">
-            <span>Tabla de Calificación</span>
-            <div style="display:flex;align-items:center;gap:.5rem">
-              <span style="font-size:.75rem;color:rgba(255,255,255,.8)">Sumar NSE:</span>
-              <select id="cal-nse-combo" onchange="updateCalTable()" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:.2rem .5rem;font-size:.78rem;cursor:pointer;font-family:Poppins,sans-serif">
-                <option value="CD">NSE C+D</option>
-                <option value="DE">NSE D+E</option>
-                <option value="BC">NSE B+C</option>
-                <option value="AB">NSE A+B</option>
-                <option value="CDE">NSE C+D+E</option>
-              </select>
-              <button onclick="calcScoreFromPesos()" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.35);border-radius:6px;padding:.25rem .75rem;font-size:.78rem;cursor:pointer;font-family:Poppins,sans-serif;margin-left:.5rem" title="Calcula el score usando los pesos y parámetros editables">↺ Calcular Score</button>
-            </div>
-          </div>
-          <div class="card-body" style="padding:.75rem">
-            <div style="overflow-x:auto">
-              <table id="cal-table" style="border-collapse:collapse;width:100%;font-size:.8rem">
-                <thead id="cal-thead"></thead>
-                <tbody id="cal-tbody"></tbody>
-              </table>
-            </div>
-            <!-- Score -->
-            <div style="margin-top:1rem;display:flex;align-items:center;justify-content:flex-end;gap:1rem">
-              <span style="font-size:.85rem;font-weight:600;color:var(--p-dark)">Calificación Final:</span>
-              <div id="cal-score-box" style="background:#F4A261;color:white;font-size:1.4rem;font-weight:800;border-radius:8px;padding:.4rem 1.25rem;min-width:90px;text-align:center;font-family:Poppins,sans-serif">
-                <input type="number" id="cal-score" step="0.01" placeholder="0.00" oninput="updateScoreDisplay()" style="background:transparent;border:none;color:white;font-size:1.3rem;font-weight:800;width:90px;text-align:center;outline:none;font-family:Poppins,sans-serif">
+        <div class="section" id="s-calificacion">
+          <div class="section-title">Calificación del Punto</div>
+
+          <div class="grid-2" style="margin-bottom: 1.25rem">
+            <!-- Map -->
+            <div class="card">
+              <div class="card-header">Mapa</div>
+              <div class="card-body" style="padding: 0.75rem">
+                <div
+                  class="map-placeholder"
+                  id="map-calificacion"
+                  onclick="triggerImg('img-cal')"
+                  style="min-height: 280px"
+                >
+                  <div class="map-icon">🗺️</div>
+                  <p>Subir imagen del mapa</p>
+                  <small>PNG · JPG</small>
+                </div>
+                <input
+                  type="file"
+                  id="img-cal"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadImgTo(this,'map-calificacion')"
+                />
               </div>
             </div>
-            <!-- Description -->
-            <div class="editable-text" id="cal-desc" contenteditable="true" style="margin-top:1rem;min-height:50px;font-size:.88rem;line-height:1.7">
+
+            <!-- Table + score -->
+            <div class="card">
+              <div class="card-header" style="justify-content: space-between">
+                <span>Tabla de Calificación</span>
+                <div style="display: flex; align-items: center; gap: 0.5rem">
+                  <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.8)"
+                    >Sumar NSE:</span
+                  >
+                  <select
+                    id="cal-nse-combo"
+                    onchange="updateCalTable()"
+                    style="
+                      background: rgba(255, 255, 255, 0.15);
+                      color: white;
+                      border: 1px solid rgba(255, 255, 255, 0.3);
+                      border-radius: 6px;
+                      padding: 0.2rem 0.5rem;
+                      font-size: 0.78rem;
+                      cursor: pointer;
+                      font-family: Poppins, sans-serif;
+                    "
+                  >
+                    <option value="CD">NSE C+D</option>
+                    <option value="DE">NSE D+E</option>
+                    <option value="BC">NSE B+C</option>
+                    <option value="AB">NSE A+B</option>
+                    <option value="CDE">NSE C+D+E</option>
+                  </select>
+                  <button
+                    onclick="calcScoreFromPesos()"
+                    style="
+                      background: rgba(255, 255, 255, 0.2);
+                      color: white;
+                      border: 1px solid rgba(255, 255, 255, 0.35);
+                      border-radius: 6px;
+                      padding: 0.25rem 0.75rem;
+                      font-size: 0.78rem;
+                      cursor: pointer;
+                      font-family: Poppins, sans-serif;
+                      margin-left: 0.5rem;
+                    "
+                    title="Calcula el score usando los pesos y parámetros editables"
+                  >
+                    ↺ Calcular Score
+                  </button>
+                </div>
+              </div>
+              <div class="card-body" style="padding: 0.75rem">
+                <div style="overflow-x: auto">
+                  <table
+                    id="cal-table"
+                    style="border-collapse: collapse; width: 100%; font-size: 0.8rem"
+                  >
+                    <thead id="cal-thead"></thead>
+                    <tbody id="cal-tbody"></tbody>
+                  </table>
+                </div>
+                <!-- Score -->
+                <div
+                  style="
+                    margin-top: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    gap: 1rem;
+                  "
+                >
+                  <span style="font-size: 0.85rem; font-weight: 600; color: var(--p-dark)"
+                    >Calificación Final:</span
+                  >
+                  <div
+                    id="cal-score-box"
+                    style="
+                      background: #f4a261;
+                      color: white;
+                      font-size: 1.4rem;
+                      font-weight: 800;
+                      border-radius: 8px;
+                      padding: 0.4rem 1.25rem;
+                      min-width: 90px;
+                      text-align: center;
+                      font-family: Poppins, sans-serif;
+                    "
+                  >
+                    <input
+                      type="number"
+                      id="cal-score"
+                      step="0.01"
+                      placeholder="0.00"
+                      oninput="updateScoreDisplay()"
+                      style="
+                        background: transparent;
+                        border: none;
+                        color: white;
+                        font-size: 1.3rem;
+                        font-weight: 800;
+                        width: 90px;
+                        text-align: center;
+                        outline: none;
+                        font-family: Poppins, sans-serif;
+                      "
+                    />
+                  </div>
+                </div>
+                <!-- Description -->
+                <!-- prettier-ignore -->
+                <div class="editable-text" id="cal-desc" contenteditable="true" style="margin-top:1rem;min-height:50px;font-size:.88rem;line-height:1.7">
               Evaluando los parámetros de población, demográficos y de movilidad con los de la plataforma actual; el sitio tiene una calificación de <strong><span id="cal-score-inline">0.00</span>%</strong>.
             </div>
-            <div class="editable-hint">✏️ Haz clic para editar</div>
+                <div class="editable-hint">✏️ Haz clic para editar</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="section" id="s-hallazgos">
-      <div class="section-title">Hallazgos del Punto</div>
-      <div class="card">
-        <div class="card-header" style="justify-content:space-between">
-          <span>Hallazgos</span>
-          <button onclick="generateHallazgos()" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:.3rem .8rem;font-size:.78rem;cursor:pointer;font-family:Poppins,sans-serif">↺ Regenerar texto</button>
-        </div>
-        <div class="card-body">
-          <div class="editable-text" id="hallazgos-texto" contenteditable="true" style="min-height:320px;line-height:2;font-size:.92rem">
+        <div class="section" id="s-hallazgos">
+          <div class="section-title">Hallazgos del Punto</div>
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between">
+              <span>Hallazgos</span>
+              <button
+                onclick="generateHallazgos()"
+                style="
+                  background: rgba(255, 255, 255, 0.15);
+                  color: white;
+                  border: 1px solid rgba(255, 255, 255, 0.3);
+                  border-radius: 6px;
+                  padding: 0.3rem 0.8rem;
+                  font-size: 0.78rem;
+                  cursor: pointer;
+                  font-family: Poppins, sans-serif;
+                "
+              >
+                ↺ Regenerar texto
+              </button>
+            </div>
+            <div class="card-body">
+              <!-- prettier-ignore -->
+              <div class="editable-text" id="hallazgos-texto" contenteditable="true" style="min-height:320px;line-height:2;font-size:.92rem">
             Cargando hallazgos...
           </div>
-          <div class="editable-hint">✏️ Haz clic para editar cualquier parte del texto</div>
+              <div class="editable-hint">✏️ Haz clic para editar cualquier parte del texto</div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="section" id="s-confidencialidad">
-      <div class="section-title">Cláusula de Confidencialidad y Propiedad Intelectual</div>
-      <div class="card">
-        <div class="card-body">
-          <div class="editable-text" id="conf-texto" contenteditable="true" style="min-height:300px;line-height:1.9;font-size:.88rem">
+        <div class="section" id="s-confidencialidad">
+          <div class="section-title">Cláusula de Confidencialidad y Propiedad Intelectual</div>
+          <div class="card">
+            <div class="card-body">
+              <!-- prettier-ignore -->
+              <div class="editable-text" id="conf-texto" contenteditable="true" style="min-height:300px;line-height:1.9;font-size:.88rem">
             <p style="font-weight:800;font-size:1.15rem;margin-bottom:1rem;color:var(--p-dark)">Cláusula de Confidencialidad y Propiedad Intelectual | <span id="conf-empresa" style="color:var(--p-mid)">Pulster.AI</span></p>
             <p style="margin-bottom:.85rem">La presente Cláusula de Confidencialidad y Propiedad Intelectual (en adelante, la "Cláusula") regula el uso, tratamiento y protección de la información, metodologías, herramientas, modelos, datos y demás activos intangibles compartidos por <span id="conf-empresa2" style="font-weight:600">Pulster.AI</span> (en adelante, el "Titular") con cualquier persona natural o jurídica que acceda a dicha información (en adelante, el "Receptor").</p>
             <p style="font-weight:700;margin-bottom:.35rem">1. INFORMACIÓN CONFIDENCIAL Y PROPIEDAD EXCLUSIVA</p>
@@ -616,203 +1977,615 @@ input:focus,textarea:focus,select:focus{border-color:var(--p-mid)}
             <p style="font-style:italic;font-weight:700;margin-bottom:.5rem">Al acceder, recibir o utilizar cualquier información, metodología o material de <span class="conf-empresa-inline">Pulster.AI</span>, el Receptor declara haber leído, comprendido y aceptado íntegramente los términos de la presente Cláusula de Confidencialidad.</p>
             <p style="color:var(--muted);font-size:.8rem;margin-top:1.5rem;border-top:1px solid var(--border);padding-top:.75rem">© <span id="conf-year"></span> <span id="conf-empresa-span" style="font-weight:700">Pulster.AI</span> — Todos los derechos reservados.</p>
           </div>
-          <div class="editable-hint">✏️ Clic para editar</div>
-          <div style="margin-top:.75rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
-            <span style="font-size:.78rem;color:var(--muted)">Empresa:</span>
-            <input type="text" id="conf-empresa-input" placeholder="Ej: Pulster.AI" value="Pulster.AI" style="flex:1;max-width:300px" oninput="updateConfEmpresa(this.value)">
+              <div class="editable-hint">✏️ Clic para editar</div>
+              <div
+                style="
+                  margin-top: 0.75rem;
+                  display: flex;
+                  gap: 0.75rem;
+                  align-items: center;
+                  flex-wrap: wrap;
+                "
+              >
+                <span style="font-size: 0.78rem; color: var(--muted)">Empresa:</span>
+                <input
+                  type="text"
+                  id="conf-empresa-input"
+                  placeholder="Ej: Pulster.AI"
+                  value="Pulster.AI"
+                  style="flex: 1; max-width: 300px"
+                  oninput="updateConfEmpresa(this.value)"
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="section" id="s-comparables">
-      <div class="section-title">Comparables</div>
-      <div class="grid-2" style="margin-bottom:1.25rem">
-        <div class="card">
-          <div class="card-header">Mapa de Comparables</div>
-          <div class="card-body" style="padding:.75rem">
-            <div class="zoom-map-wrap" id="comp-map-wrap">
-              <div class="zoom-map-inner" id="comp-map-inner">
-                <div class="zoom-map-placeholder" onclick="document.getElementById('comp-map-file').click()">
-                  <span style="font-size:2rem;opacity:.4">🗺</span>
-                  <span>Haz clic para subir imagen</span>
-                  <span style="font-size:.75rem;color:var(--muted)">Usa la rueda del ratón para hacer zoom</span>
+        <div class="section" id="s-comparables">
+          <div class="section-title">Comparables</div>
+          <div class="grid-2" style="margin-bottom: 1.25rem">
+            <div class="card">
+              <div class="card-header">Mapa de Comparables</div>
+              <div class="card-body" style="padding: 0.75rem">
+                <div class="zoom-map-wrap" id="comp-map-wrap">
+                  <div class="zoom-map-inner" id="comp-map-inner">
+                    <div
+                      class="zoom-map-placeholder"
+                      onclick="document.getElementById('comp-map-file').click()"
+                    >
+                      <span style="font-size: 2rem; opacity: 0.4">🗺</span>
+                      <span>Haz clic para subir imagen</span>
+                      <span style="font-size: 0.75rem; color: var(--muted)"
+                        >Usa la rueda del ratón para hacer zoom</span
+                      >
+                    </div>
+                  </div>
+                  <div class="zoom-controls" id="comp-zoom-controls" style="display: none">
+                    <button class="zoom-btn" onclick="zoomMap(1.2)">+</button>
+                    <button class="zoom-btn" onclick="zoomMap(0.8)">−</button>
+                    <button
+                      class="zoom-btn"
+                      onclick="resetZoom()"
+                      title="Reset"
+                      style="font-size: 0.65rem"
+                    >
+                      ↺
+                    </button>
+                  </div>
+                  <button
+                    class="zoom-upload-btn"
+                    id="comp-map-change"
+                    style="display: none"
+                    onclick="document.getElementById('comp-map-file').click()"
+                  >
+                    Cambiar imagen
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  id="comp-map-file"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="loadCompMap(this)"
+                />
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" style="justify-content: space-between; align-items: center">
+                <span>Comparables</span>
+                <div style="display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap">
+                  <div style="display: flex; align-items: center; gap: 0.4rem">
+                    <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.8)"
+                      >Isócrona:</span
+                    >
+                    <select
+                      id="comp-mins-select"
+                      onchange="changeCompMins(this.value)"
+                      style="
+                        background: rgba(255, 255, 255, 0.15);
+                        color: white;
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 6px;
+                        padding: 0.2rem 0.5rem;
+                        font-size: 0.8rem;
+                        cursor: pointer;
+                        font-family: Poppins, sans-serif;
+                      "
+                    >
+                      <option value="15" selected>15 min</option>
+                      <option value="20">20 min</option>
+                      <option value="30">30 min</option>
+                    </select>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.4rem">
+                    <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.8)"
+                      >Cantidad:</span
+                    >
+                    <select
+                      id="comp-count-select"
+                      onchange="changeCompCount(this.value)"
+                      style="
+                        background: rgba(255, 255, 255, 0.15);
+                        color: white;
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 6px;
+                        padding: 0.2rem 0.5rem;
+                        font-size: 0.8rem;
+                        cursor: pointer;
+                        font-family: Poppins, sans-serif;
+                      "
+                    >
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3" selected>3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div class="zoom-controls" id="comp-zoom-controls" style="display:none">
-                <button class="zoom-btn" onclick="zoomMap(1.2)">+</button>
-                <button class="zoom-btn" onclick="zoomMap(0.8)">−</button>
-                <button class="zoom-btn" onclick="resetZoom()" title="Reset" style="font-size:.65rem">↺</button>
-              </div>
-              <button class="zoom-upload-btn" id="comp-map-change" style="display:none" onclick="document.getElementById('comp-map-file').click()">Cambiar imagen</button>
-            </div>
-            <input type="file" id="comp-map-file" accept="image/*" style="display:none" onchange="loadCompMap(this)">
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header" style="justify-content:space-between;align-items:center">
-            <span>Comparables</span>
-            <div style="display:flex;align-items:center;gap:.9rem;flex-wrap:wrap">
-              <div style="display:flex;align-items:center;gap:.4rem">
-                <span style="font-size:.75rem;color:rgba(255,255,255,.8)">Isócrona:</span>
-                <select id="comp-mins-select" onchange="changeCompMins(this.value)" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:.2rem .5rem;font-size:.8rem;cursor:pointer;font-family:Poppins,sans-serif">
-                  <option value="15" selected>15 min</option>
-                  <option value="20">20 min</option>
-                  <option value="30">30 min</option>
-                </select>
-              </div>
-              <div style="display:flex;align-items:center;gap:.4rem">
-                <span style="font-size:.75rem;color:rgba(255,255,255,.8)">Cantidad:</span>
-                <select id="comp-count-select" onchange="changeCompCount(this.value)" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:.2rem .5rem;font-size:.8rem;cursor:pointer;font-family:Poppins,sans-serif">
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3" selected>3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </select>
+              <div class="card-body">
+                <!-- prettier-ignore -->
+                <div id="comparables-desc" class="summary-box editable-text" contenteditable="true" style="min-height:60px;cursor:text">Comparables identificados automáticamente.</div>
+                <div class="editable-hint">✏️ Clic para editar</div>
+                <div style="margin-top: 0.75rem">
+                  <div
+                    style="
+                      font-size: 0.75rem;
+                      font-weight: 700;
+                      color: var(--p-dark);
+                      margin-bottom: 0.35rem;
+                    "
+                  >
+                    Seleccionar tiendas:
+                  </div>
+                  <div
+                    id="comp-store-picker"
+                    style="display: flex; flex-wrap: wrap; gap: 0.3rem"
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="card-body">
-            <div id="comparables-desc" class="summary-box editable-text" contenteditable="true" style="min-height:60px;cursor:text">Comparables identificados automáticamente.</div>
-            <div class="editable-hint">✏️ Clic para editar</div>
-            <div style="margin-top:.75rem"><div style="font-size:.75rem;font-weight:700;color:var(--p-dark);margin-bottom:.35rem">Seleccionar tiendas:</div>
-              <div id="comp-store-picker" style="display:flex;flex-wrap:wrap;gap:.3rem"></div></div>
+          <div class="card">
+            <div class="card-body" style="padding: 0.5rem 0">
+              <div class="h-table-wrap"><div id="comparables-table"></div></div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body" style="padding:.5rem 0">
-          <div class="h-table-wrap"><div id="comparables-table"></div></div>
         </div>
       </div>
     </div>
 
-  </div>
-</div>
-
-
     <!-- ADD POINT MODAL -->
-    <div id="add-point-modal" style="display:none;position:fixed;inset:0;background:rgba(29,26,116,.6);z-index:500;overflow-y:auto;padding:2rem 1rem">
-      <div style="background:white;border-radius:16px;max-width:700px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden">
-        <div style="background:linear-gradient(135deg,#1D1A74,#9C38DF);color:white;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:1.05rem;font-weight:700;font-family:Poppins,sans-serif">Agregar Punto Manualmente</div>
-          <button onclick="closeAddPoint()" style="background:rgba(255,255,255,.2);border:none;color:white;border-radius:6px;padding:.3rem .7rem;cursor:pointer;font-size:1rem">✕</button>
+    <div
+      id="add-point-modal"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(29, 26, 116, 0.6);
+        z-index: 500;
+        overflow-y: auto;
+        padding: 2rem 1rem;
+      "
+    >
+      <div
+        style="
+          background: white;
+          border-radius: 16px;
+          max-width: 700px;
+          margin: 0 auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          overflow: hidden;
+        "
+      >
+        <div
+          style="
+            background: linear-gradient(135deg, #1d1a74, #9c38df);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <div style="font-size: 1.05rem; font-weight: 700; font-family: Poppins, sans-serif">
+            Agregar Punto Manualmente
+          </div>
+          <button
+            onclick="closeAddPoint()"
+            style="
+              background: rgba(255, 255, 255, 0.2);
+              border: none;
+              color: white;
+              border-radius: 6px;
+              padding: 0.3rem 0.7rem;
+              cursor: pointer;
+              font-size: 1rem;
+            "
+          >
+            ✕
+          </button>
         </div>
-        <div style="padding:1.5rem">
-
+        <div style="padding: 1.5rem">
           <!-- Basic info -->
-          <div style="font-size:.75rem;font-weight:700;color:#9C38DF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;padding-bottom:.35rem;border-bottom:2px solid #F0ECFF">Información General</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">
-            <div><div class="field-label">Nombre del Punto *</div><input type="text" id="ap-nombre" placeholder="Ej. Agencia Centro"></div>
-            <div><div class="field-label">Corporación / Banner</div><input type="text" id="ap-corp" placeholder="Ej. FICOHSA"></div>
-            <div><div class="field-label">Municipio</div><input type="text" id="ap-muni" placeholder="Ej. San Pedro Sula"></div>
-            <div><div class="field-label">Departamento</div><input type="text" id="ap-dpto" placeholder="Ej. Cortés"></div>
-            <div><div class="field-label">Latitud</div><input type="number" id="ap-lat" placeholder="15.5039" step="0.0001"></div>
-            <div><div class="field-label">Longitud</div><input type="number" id="ap-lng" placeholder="-88.0252" step="0.0001"></div>
-            <div><div class="field-label">Tipo URB o Rural</div>
-              <select id="ap-tipo-ur" style="width:100%;padding:.55rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem">
-                <option value="Urbano">Urbano</option><option value="Rural">Rural</option>
+          <div
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              color: #9c38df;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 0.75rem;
+              padding-bottom: 0.35rem;
+              border-bottom: 2px solid #f0ecff;
+            "
+          >
+            Información General
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem"
+          >
+            <div>
+              <div class="field-label">Nombre del Punto *</div>
+              <input type="text" id="ap-nombre" placeholder="Ej. Agencia Centro" />
+            </div>
+            <div>
+              <div class="field-label">Corporación / Banner</div>
+              <input type="text" id="ap-corp" placeholder="Ej. FICOHSA" />
+            </div>
+            <div>
+              <div class="field-label">Municipio</div>
+              <input type="text" id="ap-muni" placeholder="Ej. San Pedro Sula" />
+            </div>
+            <div>
+              <div class="field-label">Departamento</div>
+              <input type="text" id="ap-dpto" placeholder="Ej. Cortés" />
+            </div>
+            <div>
+              <div class="field-label">Latitud</div>
+              <input type="number" id="ap-lat" placeholder="15.5039" step="0.0001" />
+            </div>
+            <div>
+              <div class="field-label">Longitud</div>
+              <input type="number" id="ap-lng" placeholder="-88.0252" step="0.0001" />
+            </div>
+            <div>
+              <div class="field-label">Tipo URB o Rural</div>
+              <select
+                id="ap-tipo-ur"
+                style="
+                  width: 100%;
+                  padding: 0.55rem 0.8rem;
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  font-size: 0.88rem;
+                "
+              >
+                <option value="Urbano">Urbano</option>
+                <option value="Rural">Rural</option>
               </select>
             </div>
-            <div><div class="field-label">Método de Transporte</div>
-              <select id="ap-metodo" style="width:100%;padding:.55rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem">
-                <option>Manejando</option><option>Caminando</option><option>Transporte público</option>
+            <div>
+              <div class="field-label">Método de Transporte</div>
+              <select
+                id="ap-metodo"
+                style="
+                  width: 100%;
+                  padding: 0.55rem 0.8rem;
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  font-size: 0.88rem;
+                "
+              >
+                <option>Manejando</option>
+                <option>Caminando</option>
+                <option>Transporte público</option>
               </select>
             </div>
           </div>
 
           <!-- Isocronas -->
-          <div style="font-size:.75rem;font-weight:700;color:#9C38DF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;padding-bottom:.35rem;border-bottom:2px solid #F0ECFF">Datos por Isócrona</div>
-          <div style="display:flex;gap:.5rem;margin-bottom:.75rem">
-            <button onclick="apSelectTab('15')" id="ap-tab-15" class="ap-iso-tab" style="padding:.4rem 1rem;border-radius:20px;border:2px solid #9C38DF;background:#9C38DF;color:white;cursor:pointer;font-size:.82rem;font-family:Poppins,sans-serif;font-weight:600">15 min</button>
-            <button onclick="apSelectTab('20')" id="ap-tab-20" class="ap-iso-tab" style="padding:.4rem 1rem;border-radius:20px;border:2px solid var(--border);background:white;color:var(--muted);cursor:pointer;font-size:.82rem;font-family:Poppins,sans-serif">20 min</button>
-            <button onclick="apSelectTab('30')" id="ap-tab-30" class="ap-iso-tab" style="padding:.4rem 1rem;border-radius:20px;border:2px solid var(--border);background:white;color:var(--muted);cursor:pointer;font-size:.82rem;font-family:Poppins,sans-serif">30 min</button>
+          <div
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              color: #9c38df;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 0.75rem;
+              padding-bottom: 0.35rem;
+              border-bottom: 2px solid #f0ecff;
+            "
+          >
+            Datos por Isócrona
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem">
+            <button
+              onclick="apSelectTab('15')"
+              id="ap-tab-15"
+              class="ap-iso-tab"
+              style="
+                padding: 0.4rem 1rem;
+                border-radius: 20px;
+                border: 2px solid #9c38df;
+                background: #9c38df;
+                color: white;
+                cursor: pointer;
+                font-size: 0.82rem;
+                font-family: Poppins, sans-serif;
+                font-weight: 600;
+              "
+            >
+              15 min
+            </button>
+            <button
+              onclick="apSelectTab('20')"
+              id="ap-tab-20"
+              class="ap-iso-tab"
+              style="
+                padding: 0.4rem 1rem;
+                border-radius: 20px;
+                border: 2px solid var(--border);
+                background: white;
+                color: var(--muted);
+                cursor: pointer;
+                font-size: 0.82rem;
+                font-family: Poppins, sans-serif;
+              "
+            >
+              20 min
+            </button>
+            <button
+              onclick="apSelectTab('30')"
+              id="ap-tab-30"
+              class="ap-iso-tab"
+              style="
+                padding: 0.4rem 1rem;
+                border-radius: 20px;
+                border: 2px solid var(--border);
+                background: white;
+                color: var(--muted);
+                cursor: pointer;
+                font-size: 0.82rem;
+                font-family: Poppins, sans-serif;
+              "
+            >
+              30 min
+            </button>
           </div>
           <div id="ap-iso-panels">
             <div id="ap-panel-15" class="ap-iso-panel">
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem">
-                <div><div class="field-label">Población Residente</div><input type="text" id="ap-pob-15" placeholder="7,906"></div>
-                <div><div class="field-label">Pob. Flotante</div><input type="text" id="ap-flot-15" placeholder="2,600"></div>
-                <div><div class="field-label">Movilidad en Área</div><input type="text" id="ap-moba-15" placeholder="89,200"></div>
-                <div><div class="field-label">Movil. Frente Comercio</div><input type="text" id="ap-mobf-15" placeholder="23,400"></div>
-                <div><div class="field-label">Ingreso ($M)</div><input type="number" id="ap-ing-15" placeholder="40.9" step="0.1"></div>
-                <div><div class="field-label">Gasto Retail ($M)</div><input type="number" id="ap-ret-15" placeholder="12.0" step="0.1"></div>
-                <div><div class="field-label">NSE A (%)</div><input type="number" id="ap-nsea-15" placeholder="6" step="0.1"></div>
-                <div><div class="field-label">NSE B (%)</div><input type="number" id="ap-nseb-15" placeholder="7" step="0.1"></div>
-                <div><div class="field-label">NSE C (%)</div><input type="number" id="ap-nsec-15" placeholder="20" step="0.1"></div>
-                <div><div class="field-label">NSE D (%)</div><input type="number" id="ap-nsed-15" placeholder="39" step="0.1"></div>
-                <div><div class="field-label">NSE E (%)</div><input type="number" id="ap-nsee-15" placeholder="27" step="0.1"></div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.65rem">
+                <div>
+                  <div class="field-label">Población Residente</div>
+                  <input type="text" id="ap-pob-15" placeholder="7,906" />
+                </div>
+                <div>
+                  <div class="field-label">Pob. Flotante</div>
+                  <input type="text" id="ap-flot-15" placeholder="2,600" />
+                </div>
+                <div>
+                  <div class="field-label">Movilidad en Área</div>
+                  <input type="text" id="ap-moba-15" placeholder="89,200" />
+                </div>
+                <div>
+                  <div class="field-label">Movil. Frente Comercio</div>
+                  <input type="text" id="ap-mobf-15" placeholder="23,400" />
+                </div>
+                <div>
+                  <div class="field-label">Ingreso ($M)</div>
+                  <input type="number" id="ap-ing-15" placeholder="40.9" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">Gasto Retail ($M)</div>
+                  <input type="number" id="ap-ret-15" placeholder="12.0" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE A (%)</div>
+                  <input type="number" id="ap-nsea-15" placeholder="6" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE B (%)</div>
+                  <input type="number" id="ap-nseb-15" placeholder="7" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE C (%)</div>
+                  <input type="number" id="ap-nsec-15" placeholder="20" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE D (%)</div>
+                  <input type="number" id="ap-nsed-15" placeholder="39" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE E (%)</div>
+                  <input type="number" id="ap-nsee-15" placeholder="27" step="0.1" />
+                </div>
               </div>
             </div>
-            <div id="ap-panel-20" class="ap-iso-panel" style="display:none">
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem">
-                <div><div class="field-label">Población Residente</div><input type="text" id="ap-pob-20" placeholder="17,109"></div>
-                <div><div class="field-label">Pob. Flotante</div><input type="text" id="ap-flot-20" placeholder="5,250"></div>
-                <div><div class="field-label">Movilidad en Área</div><input type="text" id="ap-moba-20" placeholder="149,100"></div>
-                <div><div class="field-label">Movil. Frente Comercio</div><input type="text" id="ap-mobf-20" placeholder="44,200"></div>
-                <div><div class="field-label">Ingreso ($M)</div><input type="number" id="ap-ing-20" placeholder="96.1" step="0.1"></div>
-                <div><div class="field-label">Gasto Retail ($M)</div><input type="number" id="ap-ret-20" placeholder="30.5" step="0.1"></div>
-                <div><div class="field-label">NSE A (%)</div><input type="number" id="ap-nsea-20" placeholder="9" step="0.1"></div>
-                <div><div class="field-label">NSE B (%)</div><input type="number" id="ap-nseb-20" placeholder="7" step="0.1"></div>
-                <div><div class="field-label">NSE C (%)</div><input type="number" id="ap-nsec-20" placeholder="28" step="0.1"></div>
-                <div><div class="field-label">NSE D (%)</div><input type="number" id="ap-nsed-20" placeholder="37" step="0.1"></div>
-                <div><div class="field-label">NSE E (%)</div><input type="number" id="ap-nsee-20" placeholder="19" step="0.1"></div>
+            <div id="ap-panel-20" class="ap-iso-panel" style="display: none">
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.65rem">
+                <div>
+                  <div class="field-label">Población Residente</div>
+                  <input type="text" id="ap-pob-20" placeholder="17,109" />
+                </div>
+                <div>
+                  <div class="field-label">Pob. Flotante</div>
+                  <input type="text" id="ap-flot-20" placeholder="5,250" />
+                </div>
+                <div>
+                  <div class="field-label">Movilidad en Área</div>
+                  <input type="text" id="ap-moba-20" placeholder="149,100" />
+                </div>
+                <div>
+                  <div class="field-label">Movil. Frente Comercio</div>
+                  <input type="text" id="ap-mobf-20" placeholder="44,200" />
+                </div>
+                <div>
+                  <div class="field-label">Ingreso ($M)</div>
+                  <input type="number" id="ap-ing-20" placeholder="96.1" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">Gasto Retail ($M)</div>
+                  <input type="number" id="ap-ret-20" placeholder="30.5" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE A (%)</div>
+                  <input type="number" id="ap-nsea-20" placeholder="9" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE B (%)</div>
+                  <input type="number" id="ap-nseb-20" placeholder="7" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE C (%)</div>
+                  <input type="number" id="ap-nsec-20" placeholder="28" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE D (%)</div>
+                  <input type="number" id="ap-nsed-20" placeholder="37" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE E (%)</div>
+                  <input type="number" id="ap-nsee-20" placeholder="19" step="0.1" />
+                </div>
               </div>
             </div>
-            <div id="ap-panel-30" class="ap-iso-panel" style="display:none">
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem">
-                <div><div class="field-label">Población Residente</div><input type="text" id="ap-pob-30" placeholder="117,489"></div>
-                <div><div class="field-label">Pob. Flotante</div><input type="text" id="ap-flot-30" placeholder="56,700"></div>
-                <div><div class="field-label">Movilidad en Área</div><input type="text" id="ap-moba-30" placeholder="365,400"></div>
-                <div><div class="field-label">Movil. Frente Comercio</div><input type="text" id="ap-mobf-30" placeholder="23,400"></div>
-                <div><div class="field-label">Ingreso ($M)</div><input type="number" id="ap-ing-30" placeholder="829.7" step="0.1"></div>
-                <div><div class="field-label">Gasto Retail ($M)</div><input type="number" id="ap-ret-30" placeholder="247.2" step="0.1"></div>
-                <div><div class="field-label">NSE A (%)</div><input type="number" id="ap-nsea-30" placeholder="11" step="0.1"></div>
-                <div><div class="field-label">NSE B (%)</div><input type="number" id="ap-nseb-30" placeholder="7" step="0.1"></div>
-                <div><div class="field-label">NSE C (%)</div><input type="number" id="ap-nsec-30" placeholder="36" step="0.1"></div>
-                <div><div class="field-label">NSE D (%)</div><input type="number" id="ap-nsed-30" placeholder="20" step="0.1"></div>
-                <div><div class="field-label">NSE E (%)</div><input type="number" id="ap-nsee-30" placeholder="24" step="0.1"></div>
+            <div id="ap-panel-30" class="ap-iso-panel" style="display: none">
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.65rem">
+                <div>
+                  <div class="field-label">Población Residente</div>
+                  <input type="text" id="ap-pob-30" placeholder="117,489" />
+                </div>
+                <div>
+                  <div class="field-label">Pob. Flotante</div>
+                  <input type="text" id="ap-flot-30" placeholder="56,700" />
+                </div>
+                <div>
+                  <div class="field-label">Movilidad en Área</div>
+                  <input type="text" id="ap-moba-30" placeholder="365,400" />
+                </div>
+                <div>
+                  <div class="field-label">Movil. Frente Comercio</div>
+                  <input type="text" id="ap-mobf-30" placeholder="23,400" />
+                </div>
+                <div>
+                  <div class="field-label">Ingreso ($M)</div>
+                  <input type="number" id="ap-ing-30" placeholder="829.7" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">Gasto Retail ($M)</div>
+                  <input type="number" id="ap-ret-30" placeholder="247.2" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE A (%)</div>
+                  <input type="number" id="ap-nsea-30" placeholder="11" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE B (%)</div>
+                  <input type="number" id="ap-nseb-30" placeholder="7" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE C (%)</div>
+                  <input type="number" id="ap-nsec-30" placeholder="36" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE D (%)</div>
+                  <input type="number" id="ap-nsed-30" placeholder="20" step="0.1" />
+                </div>
+                <div>
+                  <div class="field-label">NSE E (%)</div>
+                  <input type="number" id="ap-nsee-30" placeholder="24" step="0.1" />
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Competitors -->
-          <div style="font-size:.75rem;font-weight:700;color:#9C38DF;text-transform:uppercase;letter-spacing:.5px;margin:1rem 0 .75rem;padding-bottom:.35rem;border-bottom:2px solid #F0ECFF">Competidores</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem;margin-bottom:1.25rem">
-            <div><div class="field-label">Competidor 1</div><input type="text" id="ap-c1" placeholder="Nombre tienda"></div>
-            <div><div class="field-label">Competidor 2</div><input type="text" id="ap-c2" placeholder="Nombre tienda"></div>
-            <div><div class="field-label">Competidor 3</div><input type="text" id="ap-c3" placeholder="Nombre tienda"></div>
-            <div><div class="field-label">Competidor 4</div><input type="text" id="ap-c4" placeholder="Nombre tienda"></div>
-            <div><div class="field-label">Competidor 5</div><input type="text" id="ap-c5" placeholder="Nombre tienda"></div>
+          <div
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              color: #9c38df;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin: 1rem 0 0.75rem;
+              padding-bottom: 0.35rem;
+              border-bottom: 2px solid #f0ecff;
+            "
+          >
+            Competidores
+          </div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: 0.65rem;
+              margin-bottom: 1.25rem;
+            "
+          >
+            <div>
+              <div class="field-label">Competidor 1</div>
+              <input type="text" id="ap-c1" placeholder="Nombre tienda" />
+            </div>
+            <div>
+              <div class="field-label">Competidor 2</div>
+              <input type="text" id="ap-c2" placeholder="Nombre tienda" />
+            </div>
+            <div>
+              <div class="field-label">Competidor 3</div>
+              <input type="text" id="ap-c3" placeholder="Nombre tienda" />
+            </div>
+            <div>
+              <div class="field-label">Competidor 4</div>
+              <input type="text" id="ap-c4" placeholder="Nombre tienda" />
+            </div>
+            <div>
+              <div class="field-label">Competidor 5</div>
+              <input type="text" id="ap-c5" placeholder="Nombre tienda" />
+            </div>
           </div>
 
-          <div id="ap-error" style="color:var(--red);font-size:.82rem;margin-bottom:.75rem;display:none">⚠ Ingresa al menos el nombre del punto.</div>
-          <div style="display:flex;gap:.75rem;justify-content:flex-end">
-            <button onclick="closeAddPoint()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:.6rem 1.25rem;cursor:pointer;font-size:.88rem;color:var(--muted);font-family:Poppins,sans-serif">Cancelar</button>
-            <button onclick="saveNewPoint()" style="background:linear-gradient(135deg,#1D1A74,#9C38DF);color:white;border:none;border-radius:8px;padding:.6rem 1.5rem;cursor:pointer;font-size:.88rem;font-weight:600;font-family:Poppins,sans-serif">Agregar Punto</button>
+          <div
+            id="ap-error"
+            style="color: var(--red); font-size: 0.82rem; margin-bottom: 0.75rem; display: none"
+          >
+            ⚠ Ingresa al menos el nombre del punto.
+          </div>
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end">
+            <button
+              onclick="closeAddPoint()"
+              style="
+                background: none;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                padding: 0.6rem 1.25rem;
+                cursor: pointer;
+                font-size: 0.88rem;
+                color: var(--muted);
+                font-family: Poppins, sans-serif;
+              "
+            >
+              Cancelar
+            </button>
+            <button
+              onclick="saveNewPoint()"
+              style="
+                background: linear-gradient(135deg, #1d1a74, #9c38df);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 0.6rem 1.5rem;
+                cursor: pointer;
+                font-size: 0.88rem;
+                font-weight: 600;
+                font-family: Poppins, sans-serif;
+              "
+            >
+              Agregar Punto
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-<script src="src/js/01-state.js"></script>
-<script src="src/js/02-toggles.js"></script>
-<script src="src/js/03-images.js"></script>
-<script src="src/js/04-point-state.js"></script>
-<script src="src/js/05-session.js"></script>
-<script src="src/js/06-trade-area-logo.js"></script>
-<script src="src/js/07-import.js"></script>
-<script src="src/js/08-switch-point.js"></script>
-<script src="src/js/09-compliance.js"></script>
-<script src="src/js/10-comparables.js"></script>
-<script src="src/js/11-routes.js"></script>
-<script src="src/js/12-ui-nav.js"></script>
-<script src="src/js/13-helpers.js"></script>
-<script src="src/js/14-zoom-map.js"></script>
-<script src="src/js/15-calificacion.js"></script>
-<script src="src/js/16-hallazgos.js"></script>
-<script src="src/js/17-add-point.js"></script>
-<script src="src/js/18-export.js"></script>
-</body>
+    <script src="src/js/01-state.js"></script>
+    <script src="src/js/02-toggles.js"></script>
+    <script src="src/js/03-images.js"></script>
+    <script src="src/js/04-point-state.js"></script>
+    <script src="src/js/05-session.js"></script>
+    <script src="src/js/06-trade-area-logo.js"></script>
+    <script src="src/js/07-import.js"></script>
+    <script src="src/js/08-switch-point.js"></script>
+    <script src="src/js/09-compliance.js"></script>
+    <script src="src/js/10-comparables.js"></script>
+    <script src="src/js/11-routes.js"></script>
+    <script src="src/js/12-ui-nav.js"></script>
+    <script src="src/js/13-helpers.js"></script>
+    <script src="src/js/14-zoom-map.js"></script>
+    <script src="src/js/15-calificacion.js"></script>
+    <script src="src/js/16-hallazgos.js"></script>
+    <script src="src/js/17-add-point.js"></script>
+    <script src="src/js/18-export.js"></script>
+  </body>
 </html>

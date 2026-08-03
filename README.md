@@ -46,26 +46,47 @@ build.js            Genera el entregable de un archivo. Sin dependencias.
 dist/               Salida del build (ignorada por git)
 ```
 
-| Módulo | Qué contiene |
-|---|---|
-| `01-state.js` | Estado global, mapas de columnas `PT`/`EG`, accesores `ptGet`/`egGet` |
-| `02-toggles.js` | `toggleComp`, `toggleOverlap`, `toggleCal`, guardado de rutas |
-| `03-images.js` | `renderImg`, `renderCompMap` |
-| `04-point-state.js` | `saveCtxState` / `restoreCtxState` (estado por punto) |
-| `05-session.js` | `saveSession`, `importSession` (sesión y lectura de reportes exportados) |
-| `06-trade-area-logo.js` | Modo trade area, carga del logo |
-| `07-import.js` | Drop zone, lectura de XLSX, `detectSheets`, `buildReport` |
-| `08-switch-point.js` | `switchPoint`, pestañas de tiempo, contexto IA |
-| `09-compliance.js` | Tablas de cumplimiento, NSE, edición por tiempo |
-| `10-comparables.js` | `buildComparables` y overrides manuales |
-| `11-routes.js` | Rutas calientes y accesos |
-| `12-ui-nav.js` | Tags, imágenes, navegación, visibilidad de apartados |
-| `13-helpers.js` | `getMainCSS`, `pf`, formateadores, `setLoading` |
-| `14-zoom-map.js` | Mapa de comparables con zoom/pan |
-| `15-calificacion.js` | Pesos, score, tabla de calificación, gauge, overlap |
-| `16-hallazgos.js` | `generateHallazgos` |
-| `17-add-point.js` | Modal de alta manual de punto |
-| `18-export.js` | `exportStaticHTML` / `buildExport` |
+| Módulo                  | Qué contiene                                                             |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `01-state.js`           | Estado global, mapas de columnas `PT`/`EG`, accesores `ptGet`/`egGet`    |
+| `02-toggles.js`         | `toggleComp`, `toggleOverlap`, `toggleCal`, guardado de rutas            |
+| `03-images.js`          | `renderImg`, `renderCompMap`                                             |
+| `04-point-state.js`     | `saveCtxState` / `restoreCtxState` (estado por punto)                    |
+| `05-session.js`         | `saveSession`, `importSession` (sesión y lectura de reportes exportados) |
+| `06-trade-area-logo.js` | Modo trade area, carga del logo                                          |
+| `07-import.js`          | Drop zone, lectura de XLSX, `detectSheets`, `buildReport`                |
+| `08-switch-point.js`    | `switchPoint`, pestañas de tiempo, contexto IA                           |
+| `09-compliance.js`      | Tablas de cumplimiento, NSE, edición por tiempo                          |
+| `10-comparables.js`     | `buildComparables` y overrides manuales                                  |
+| `11-routes.js`          | Rutas calientes y accesos                                                |
+| `12-ui-nav.js`          | Tags, imágenes, navegación, visibilidad de apartados                     |
+| `13-helpers.js`         | `getMainCSS`, `pf`, formateadores, `setLoading`                          |
+| `14-zoom-map.js`        | Mapa de comparables con zoom/pan                                         |
+| `15-calificacion.js`    | Pesos, score, tabla de calificación, gauge, overlap                      |
+| `16-hallazgos.js`       | `generateHallazgos`                                                      |
+| `17-add-point.js`       | Modal de alta manual de punto                                            |
+| `18-export.js`          | `exportStaticHTML` / `buildExport`                                       |
+
+## Formato
+
+El código está formateado con Prettier. La configuración vive en `.prettierrc.json`, así
+que el resultado es el mismo en cualquier máquina.
+
+```
+npm install     # solo la primera vez, instala Prettier (dependencia de desarrollo)
+npm run format  # formatea todo
+```
+
+Esto **no** afecta a la app: sigue sin necesitar `npm install` para funcionar. Prettier es
+solo una herramienta de desarrollo.
+
+`.prettierignore` excluye `vendor/` (biblioteca minificada y artefacto generado), `dist/` y
+el monolito original.
+
+**Los 11 elementos `contenteditable` llevan `<!-- prettier-ignore -->`, y hay que
+mantenerlo.** Prettier reindenta el texto interno y hasta lo parte en varias líneas; ese
+espacio en blanco entra en el contenido editable, se guarda en `CTX_STORE` y se arrastra al
+reporte exportado. Si se añade otro elemento editable, hay que ponerle el comentario.
 
 ## Notas para editar
 
@@ -86,6 +107,6 @@ inline es lo que garantiza que el export funcione igual en dev y en el entregabl
 - `BaseAnalisisdePuntosBueno.html` es el archivo monolítico original. Se conserva solo como
   referencia; ya no se usa ni se construye desde él. Conviene borrarlo para que nadie lo
   edite por error.
-- El campo "empresa" de Confidencialidad (`index.html:621`) llama a `updateConfEmpresa()`,
+- El campo "empresa" de Confidencialidad (`index.html:1997`) llama a `updateConfEmpresa()`,
   que nunca se definió. Lanza un `ReferenceError` al escribir en él. Bug preexistente,
   anterior a la modularización.

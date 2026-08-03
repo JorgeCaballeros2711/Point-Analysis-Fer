@@ -1,0 +1,10 @@
+# Biblioteca de terceros minificada y artefacto generado: no se formatean.
+vendor/
+
+# Salida del build.
+dist/
+
+# Monolito original, conservado solo como referencia histórica.
+BaseAnalisisdePuntosBueno.html
+
+node_modules/

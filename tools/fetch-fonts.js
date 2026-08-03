@@ -22,7 +22,8 @@ const WEIGHTS = [300, 400, 600, 700, 800];
 const SUBSET = 'latin';
 const CSS_URL = `https://fonts.googleapis.com/css2?family=${FAMILY}:wght@${WEIGHTS.join(';')}&display=swap`;
 // Google devuelve woff2 solo si el User-Agent parece un navegador moderno.
-const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
+const UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
 
 const OUT = path.join(__dirname, '..', 'vendor', 'fonts-poppins.js');
 
@@ -46,7 +47,9 @@ async function get(url, asBuffer) {
   }
 
   if (blocks.length !== WEIGHTS.length) {
-    throw new Error(`Se esperaban ${WEIGHTS.length} bloques "${SUBSET}", se encontraron ${blocks.length}`);
+    throw new Error(
+      `Se esperaban ${WEIGHTS.length} bloques "${SUBSET}", se encontraron ${blocks.length}`
+    );
   }
 
   const rules = [];
@@ -84,18 +87,18 @@ async function get(url, asBuffer) {
     '  el.textContent = css;',
     '  document.head.appendChild(el);',
     '})();',
-    '',
+    ''
   ].join('\n');
 
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, js, 'utf8');
 
-  const kb = (n) => (n / 1024).toFixed(1) + ' KB';
+  const kb = n => (n / 1024).toFixed(1) + ' KB';
   console.log(
     `vendor/fonts-poppins.js — ${blocks.length} pesos (${WEIGHTS.join(', ')}), ` +
-    `${kb(bytes)} de woff2 → ${kb(fs.statSync(OUT).size)} embebido`
+      `${kb(bytes)} de woff2 → ${kb(fs.statSync(OUT).size)} embebido`
   );
-})().catch((e) => {
+})().catch(e => {
   console.error('Falló la descarga de fuentes:', e.message);
   process.exit(1);
 });

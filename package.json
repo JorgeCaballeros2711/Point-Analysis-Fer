@@ -1,0 +1,15 @@
+{
+  "name": "point-analysis",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reporte interactivo de análisis de ubicaciones. Se entrega como un HTML único.",
+  "scripts": {
+    "build": "node build.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "fonts": "node tools/fetch-fonts.js"
+  },
+  "devDependencies": {
+    "prettier": "3.4.2"
+  }
+}

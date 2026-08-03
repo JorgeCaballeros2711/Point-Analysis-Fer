@@ -47,19 +47,21 @@ if (!sources.length) {
 
 // El entregable no debe quedar con ninguna referencia externa: si queda una, un
 // analista sin internet se encuentra con una herramienta a medias.
-const remote = [...output.matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)].map((r) => r[1]);
-const imports = [...output.matchAll(/@import\s+url\(['"]?(https?:\/\/[^'")]+)/g)].map((r) => r[1]);
+const remote = [...output.matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)].map(r => r[1]);
+const imports = [...output.matchAll(/@import\s+url\(['"]?(https?:\/\/[^'")]+)/g)].map(r => r[1]);
 const external = [...new Set([...remote, ...imports])];
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 fs.writeFileSync(OUT_FILE, output, 'utf8');
 
 const kb = (Buffer.byteLength(output, 'utf8') / 1024).toFixed(1);
-console.log(`${path.relative(ROOT, OUT_FILE)}  —  ${kb} KB  (${sources.length} archivos inlineados)`);
+console.log(
+  `${path.relative(ROOT, OUT_FILE)}  —  ${kb} KB  (${sources.length} archivos inlineados)`
+);
 
 if (external.length) {
   console.warn('\nADVERTENCIA — el entregable depende de la red:');
-  external.forEach((u) => console.warn('  ' + u));
+  external.forEach(u => console.warn('  ' + u));
   process.exitCode = 1;
 } else {
   console.log('Sin dependencias externas: funciona sin internet.');
